@@ -1,0 +1,19 @@
+# Test dependencies
+pytest==7.3.1
+pytest-cov==4.1.0
+pytest-mock==3.10.0
+requests-mock==1.10.0
+
+# Google Cloud dependencies
+google-cloud-firestore==2.11.1
+google-cloud-storage==2.9.0
+google-cloud-pubsub==2.17.1
+google-cloud-aiplatform==1.26.1
+
+# Flask for testing Cloud Run services
+flask==2.2.3
+werkzeug==2.2.3
+
+# Utilities
+coverage==7.2.7
+mock==5.0.2
