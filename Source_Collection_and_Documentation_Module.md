@@ -111,6 +111,34 @@ Specify the citation style to be used:
 
 ## Source Collection Process
 
+The Source Collection Agent is responsible for finding relevant sources to support the content being developed. Here are the detailed steps it should follow:
+
+**Step 1: Analyze Source Request Log**
+
+*   The agent receives a source request log, which lists the information needs and requirements for the content. This log is generated during the pre-development phase and includes specific details about the type of information needed, such as:
+    *   Statistical data
+    *   Technical definitions
+    *   Case studies
+    *   Expert opinions
+*   The agent reviews this log to understand the specific requirements for each source request.
+
+**Step 2: Identify Relevant Search Terms**
+
+*   For each source request, the agent identifies relevant keywords and search terms. This involves:
+    *   Extracting key concepts and topics from the source request.
+    *   Identifying related terms and synonyms.
+    *   Formulating search queries that accurately reflect the information need.
+
+    **Example**:
+
+    *   Source Request: "Statistics on AI adoption rates among SMEs in 2023"
+    *   Keywords: "AI adoption," "SMEs," "small and medium enterprises," "2023," "statistics," "market research"
+    *   Search Queries:
+        *   "AI adoption rates SMEs 2023"
+        *   "AI in small and medium enterprises statistics 2023"
+        *   "market research AI adoption SMEs 2023"
+        *   "Generative AI adoption in SMEs 2023"
+
 ### 1. Source Identification
 
 During initial draft creation:
@@ -131,15 +159,47 @@ During initial draft creation:
    - Prioritize based on importance to the content
 
 ### 2. Source Research
+*   The agent performs searches across a variety of sources to identify relevant information. The search process involves:
+    *   **Using Search Engines**: Leveraging search engines like Google, Google Scholar, and DuckDuckGo with the identified search queries.
+    *   **Targeting Reputable Repositories**: Focusing on credible sources such as:
+        *   **Academic databases**: Google Scholar, IEEE Xplore, ACM Digital Library, arXiv
+        *   **Industry sources**: Reports and publications from Gartner, Forrester, McKinsey, Deloitte, PwC, and relevant industry associations.
+        *   **Government/NGO publications**: Publications from organizations like the EU AI Act, NIST, ISO, OECD, and UN agencies.
+        *   **Tech publications**: Reputable journals, conference proceedings, and tech news outlets (e.g., MIT Technology Review, Wired, TechCrunch).
+        *   **Hub-specific resources**: Internal knowledge base, previous content, and curated lists of reliable sources within the Hub.
+    *   **Advanced Search Techniques**: Using advanced search operators (e.g., site:, filetype:, intitle:) to refine search results and focus on specific types of sources (e.g., PDFs, specific websites).
 
-For each identified source need:
+    **Example**:
 
-1. **Search Relevant Repositories**:
-   - **Academic databases**: Google Scholar, IEEE Xplore, ACM Digital Library
-   - **Industry sources**: Gartner, Forrester, McKinsey, industry associations
-   - **Government/NGO publications**: EU AI Act, NIST, ISO standards
-   - **Tech publications**: Reputable journals, conference proceedings
-   - **Hub-specific resources**: Internal knowledge base, previous content
+    *   For the search query "AI adoption rates SMEs 2023," the agent might find sources such as:
+        *   A McKinsey report titled "The State of AI in 2023: Generative AI's Breakout Year."
+        *   An IDC spending guide on worldwide AI investments.
+        *   A Gartner report on emerging technology trends for SMEs.
+
+**Step 3: Initial Screening of Search Results**
+
+*   The agent performs an initial screening of the search results to identify potentially relevant sources. This involves:
+    *   **Reviewing Titles and Snippets**: Assessing the relevance of each source based on its title and the provided search snippet.
+    *   **Checking Publication Dates**: Ensuring the source is current and meets the recency requirements specified in the source request log.
+    *   **Identifying Source Types**: Categorizing sources based on their type (e.g., research paper, industry report, case study).
+    *   **Assessing Source Credibility**: Making an initial judgment about the source's credibility based on the publisher, author, and domain.
+
+**Step 4: Collect Source Information**
+
+*   For potentially relevant sources identified in the initial screening, the agent collects key information:
+
+    *   **Title**: The full title of the source.
+    *   **Author(s) / Organization**: The author(s) or the organization responsible for the publication.
+    *   **Publication**: The name of the journal, report, website, or other publication venue.
+    *   **Date**: The date of publication or last update.
+    *   **URL / DOI**: The URL or DOI (Digital Object Identifier) where the source can be accessed.
+    *   **Abstract / Summary**: A brief summary or abstract of the source's content, if available.
+
+    This information is used to create a record for each potential source, facilitating further evaluation.
+
+**Step 5: Document Potential Sources**
+
+*   The agent documents the collected information for each potential source in a standardized format. This documentation includes all relevant details needed for evaluation and integration into the content.
 
 2. **Document Potential Sources**:
 
