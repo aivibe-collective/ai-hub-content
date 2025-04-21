@@ -1,0 +1,37 @@
+# Review Checklists
+
+This folder contains the standard checklists used during Phase 3 (Review & Refinement) of the [Content Creation Methodology](../Methodology.md).
+
+These checklists are essential tools to ensure content published on the AI Community & Sustainability Hub meets our standards for:
+
+* **Accuracy and Quality:** Verifying technical correctness and overall writing quality.
+* **Mission Alignment:** Guaranteeing deep and practical integration of Responsible AI, Sustainability (Environmental & Economic), and Global Inclusion principles.
+* **Audience Relevance:** Ensuring content is clear, practical, and useful for specific target audiences, including SMEs and non-technical users.
+* **Accessibility:** Confirming content is accessible to users with diverse needs and resource constraints.
+* **Content Integrity:** Auditing for factual accuracy and potential biases.
+
+---
+
+## Checklists Inventory
+
+Below is a list of the standard checklists available in this folder:
+
+* [`Technical_Accuracy_Review.md`](./Technical_Accuracy_Review.md): For verifying the correctness, currency, and robustness of technical information, code, and instructions. Used by Technical Subject Matter Experts.
+* [`ResponsibleAI_Review.md`](./ResponsibleAI_Review.md): For evaluating the content's treatment of ethical, privacy, and security dimensions. Used by Responsible AI Specialists.
+* [`Sustainability_Review.md`](./Sustainability_Review.md): For evaluating the content's treatment of environmental and economic sustainability. Used by Sustainability Specialists or Business Analysts.
+* [`Inclusion_Accessibility_Review.md`](./Inclusion_Accessibility_Review.md): For evaluating content inclusivity, accessibility features, and consideration of diverse needs and resource constraints. Used by Accessibility and Inclusion Specialists.
+* [`Audience_Practicality_Review.md`](./Audience_Practicality_Review.md): For assessing content clarity, relevance, and practical usability from the perspective of the target audience (e.g., SME owner, non-technical user). Used by Audience Representatives.
+* [`Editorial_Clarity_Review.md`](./Editorial_Clarity_Review.md): For reviewing grammar, spelling, punctuation, consistency, tone, and overall readability. Used by Editors.
+* [`FactChecking_BiasAudit_Review.md`](./FactChecking_BiasAudit_Review.md): For verifying factual claims and auditing content for potential biases, including those from AI-assisted drafting. Used by Fact-Checkers and Bias Auditors.
+
+---
+
+## How to Use These Checklists
+
+If you are assigned as a reviewer for a specific content item:
+
+1. Consult the [Content Creation Methodology](../Methodology.md), specifically **Phase 3 (Review & Refinement)**, to understand the review process, your role, and the timing of your review.
+2. Navigate to this folder and open or download the specific checklist(s) assigned to you for that review round.
+3. Go through the content item being reviewed and fill out the checklist thoroughly.
+4. Provide specific, actionable feedback and suggested changes directly in the review platform/document or in a separate feedback file, referencing the checklist points.
+5. Submit your completed checklist and feedback according to the review

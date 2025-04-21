@@ -1,0 +1,56 @@
+# AI Community & Sustainability Hub Content Repository
+
+This repository serves as the central source for all content intended for the AI Community & Sustainability Hub platform. It houses documentation, templates, content drafts, practical components, and review materials following our defined content creation methodology.
+
+**Hub Mission Statement:**
+
+> Empowering responsible AI learning, building, and deployment for all — with a focus on SMEs, sustainability, and global inclusion.
+
+All content within this repository is developed and organized to align with this core mission.
+
+---
+
+## Getting Started
+
+1.  **Ensure you have Python installed.**
+2.  **Navigate** to the directory where you want the `HubContent` folder to be created in your terminal or command prompt.
+3.  **Run the structure creation script:**
+    ```bash
+    python create_hub_repo.py
+    ```
+4.  This will create the `HubContent` folder and the entire directory structure within it.
+
+---
+
+## Understanding the Repository Structure
+
+The repository is organized mirroring the main sections of the AI Community & Sustainability Hub platform.
+
+### `/HubContent/`
+
+This is the root directory for all content source files.
+
+### `/HubContent/Standards/`
+
+This critical folder contains the foundational documents and templates that govern *how* content is created, reviewed, and organized.
+
+* `/HubContent/Standards/Methodology.md`: The complete Content Creation Methodology document. **Start here** to understand the process.
+* `/HubContent/Standards/StyleGuide/`: Contains the writing style guide and visual design kit elements for content creators.
+* `/HubContent/Standards/OutlineTemplates/`: Houses the predefined templates for different content types (Learning Modules, Case Studies, How-Tos, etc.).
+* `/HubContent/Standards/ReviewChecklists/`: Standard checklists used by various reviewers (technical, ethical, SME, accessibility, etc.).
+* `/HubContent/Standards/Personas/`: Documentation of target audience personas, including SMEs and those with specific resource constraints.
+* `/HubContent/Standards/MissionResources/`: Central resources supporting the integration of mission pillars (e.g., `/ResponsibleAI_Frameworks/`, `Sustainability_Tools.md` links, `GlobalInclusion_Guidelines.md`).
+* `/HubContent/Standards/OperationalDocs/`: Internal documentation on workflow, reviewer roles, tool usage for content creation.
+
+### Content Sections
+
+The following folders correspond to the main sections of the Hub platform and contain the source files for the content displayed on the site.
+
+* `/HubContent/HomePage/`: Source content for the Hub's landing page.
+    * `/Assets/`: Images or media specific to the home page banner, etc.
+* `/HubContent/LearnAI/`: Content for the Ethical AI Academy learning tracks (Beginner, Intermediate, Expert).
+    * `/Beginner/`, `/Intermediate/`, `/Expert/`: Folders for each track.
+    * `/_TemplateContent/`: **Placeholder folders**. Actual content modules (e.g., `Module_01_Foundations/`, `Module_XX_Topic/`) will be created here following the Learning Module outline structure.
+        * Within each module folder: `ContentDraft.md` (or link to source), `/Practical/` (code, notebooks, data), `/Assets/`, `/ReviewFeedback/`.
+    * `/Assessments/`: Files related to track assessments (quizzes, project briefs).
+* `/HubContent/ApplyAI/`: Resources for applying AI in real-world contexts, especially
