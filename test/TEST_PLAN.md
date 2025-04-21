@@ -43,6 +43,8 @@ The test cases are organized by component, following the workflow steps in the E
 | TC1.1 | Valid Template | Content plan for a "Beginner" learning module | System recommends "LearningModule.md" template | Unit test |
 | TC1.2 | Invalid Template | Content plan for a blog post | System does not recommend "CaseStudy.md" template | Unit test |
 | TC1.3 | No Template | Content plan with invalid content type | System fails with clear error message | Unit test |
+| TC1.5 | Firestore Error | Content plan with valid parameters but Firestore error | System raises exception | Unit test |
+| TC1.6 | Empty Content Plan | Content plan with empty title and objectives | System handles gracefully | Unit test |
 | TC1.4 | Template Customization | Content plan and selected template | Suggestions for template modifications | Manual |
 
 ### 2.2 File Structure Creation (Workflow Step 2)
@@ -76,6 +78,10 @@ The test cases are organized by component, following the workflow steps in the E
 | TC5.1 | Source Need Identification | Section with factual claim | System flags citation needed | Unit test |
 | TC5.2 | Source Research | Source need | System researches potential sources | Unit test |
 | TC5.3 | CRAAP Test | Set of mock sources | System evaluates sources using CRAAP criteria | Unit test |
+| TC5.6 | Outdated Source | Source from 2010 with outdated information | System gives low currency and accuracy scores | Unit test |
+| TC5.7 | Biased Source | Source from commercial vendor with extreme claims | System gives low purpose and accuracy scores | Unit test |
+| TC5.8 | Anonymous Source | Source with no clear author | System gives low authority score | Unit test |
+| TC5.9 | Malformed URL | Source with invalid URL | System handles error gracefully | Unit test |
 | TC5.4 | Citation Generation | Section and list of sources | In-text citations in correct format | Unit test |
 | TC5.5 | Source Integration | Section and selected source | Source integrated with proper citation | Unit test |
 
@@ -143,8 +149,14 @@ python test/run_tests.py --modules test_template_selection test_source_collectio
 # Run tests in verbose mode
 python test/run_tests.py --verbose
 
-# Set up test environment and run tests
+# Set up local test environment and run tests
 python test/run_tests.py --setup
+
+# Set up cloud test environment (requires local setup first)
+python test/run_tests.py --cloud-setup
+
+# List available test modules
+python test/run_tests.py --list
 ```
 
 ### 3.2 Integration Tests
@@ -221,7 +233,14 @@ python test/setup_test_env.py
 Test data can be cleaned up using:
 
 ```bash
+# Clean up local test data
 python test/cleanup_test_env.py
+
+# Clean up local and cloud test data
+python test/cleanup_test_env.py --cloud
+
+# Force cleanup without confirmation
+python test/cleanup_test_env.py --force
 ```
 
 ## 7. Troubleshooting

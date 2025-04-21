@@ -13,11 +13,11 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from cloud_function.main import generate_content_plan
-import test.config as config
+from test import config
 
 class TestContentGeneration(unittest.TestCase):
     """Test cases for the Content Generation component."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
         # Load test content plans
@@ -27,7 +27,7 @@ class TestContentGeneration(unittest.TestCase):
                 with open(os.path.join(config.CONTENT_PLANS_DIR, filename), 'r') as f:
                     plan = json.load(f)
                     self.content_plans[plan['id']] = plan
-        
+
         # Load test templates
         self.templates = {}
         for filename in os.listdir(config.TEMPLATES_DIR):
@@ -35,7 +35,7 @@ class TestContentGeneration(unittest.TestCase):
                 with open(os.path.join(config.TEMPLATES_DIR, filename), 'r') as f:
                     template = json.load(f)
                     self.templates[template['type']] = template
-    
+
     @patch('cloud_function.main.call_vertex_ai')
     @patch('cloud_function.main.firestore.Client')
     @patch('cloud_function.main.publish_event')
@@ -44,14 +44,14 @@ class TestContentGeneration(unittest.TestCase):
         # Arrange
         mock_db = MagicMock()
         mock_firestore.return_value = mock_db
-        
+
         mock_content_ref = MagicMock()
         mock_db.collection.return_value.document.return_value = mock_content_ref
-        
+
         # Mock the Firestore get response
         plan = self.content_plans.get('plan_learning_beginner')
         template = self.templates.get(config.ContentTypes.LEARNING_MODULE)
-        
+
         mock_content_data = {
             'metadata': {
                 'title': plan['title'],
@@ -62,7 +62,7 @@ class TestContentGeneration(unittest.TestCase):
             'template': template
         }
         mock_content_ref.get.return_value.to_dict.return_value = mock_content_data
-        
+
         # Mock the Vertex AI response
         mock_call_vertex.return_value = json.dumps({
             "learning_objectives": [
@@ -111,7 +111,7 @@ class TestContentGeneration(unittest.TestCase):
                 ]
             }
         })
-        
+
         # Create a mock Pub/Sub event
         event_data = {
             'content_id': 'test_content_1',
@@ -120,10 +120,10 @@ class TestContentGeneration(unittest.TestCase):
         event = {
             'data': base64.b64encode(json.dumps(event_data).encode('utf-8'))
         }
-        
+
         # Act
         generate_content_plan(event, None)
-        
+
         # Assert
         # Verify the call to Vertex AI
         mock_call_vertex.assert_called_once()
@@ -131,12 +131,12 @@ class TestContentGeneration(unittest.TestCase):
         self.assertIn("You are an expert content planner", prompt)
         self.assertIn(plan['title'], prompt)
         self.assertIn(plan['audience_level'], prompt)
-        
+
         # Verify Firestore update
         mock_db.collection.assert_called_with('content-items')
         mock_db.collection().document.assert_called_with('test_content_1')
         mock_content_ref.update.assert_called_once()
-        
+
         # Verify the update contains the content plan
         update_args = mock_content_ref.update.call_args[0][0]
         self.assertIn('content.plan', update_args)
@@ -144,14 +144,14 @@ class TestContentGeneration(unittest.TestCase):
         self.assertEqual(update_args['metadata.status'], 'plan_generated')
         self.assertIn('workflow.current_stage', update_args)
         self.assertEqual(update_args['workflow.current_stage'], 'section_population')
-        
+
         # Verify the event was published
         mock_publish.assert_called_once()
         publish_args = mock_publish.call_args[0]
         self.assertEqual(publish_args[0], 'content-creation-events')
         self.assertEqual(publish_args[1]['content_id'], 'test_content_1')
         self.assertEqual(publish_args[1]['action'], 'populate_sections')
-    
+
     @patch('cloud_function.main.call_vertex_ai')
     @patch('cloud_function.main.firestore.Client')
     @patch('cloud_function.main.publish_event')
@@ -160,14 +160,14 @@ class TestContentGeneration(unittest.TestCase):
         # Arrange
         mock_db = MagicMock()
         mock_firestore.return_value = mock_db
-        
+
         mock_content_ref = MagicMock()
         mock_db.collection.return_value.document.return_value = mock_content_ref
-        
+
         # Mock the Firestore get response
         plan = self.content_plans.get('plan_learning_beginner')
         template = self.templates.get(config.ContentTypes.LEARNING_MODULE)
-        
+
         mock_content_data = {
             'metadata': {
                 'title': plan['title'],
@@ -178,10 +178,10 @@ class TestContentGeneration(unittest.TestCase):
             'template': template
         }
         mock_content_ref.get.return_value.to_dict.return_value = mock_content_data
-        
+
         # Mock the Vertex AI response with non-JSON text
         mock_call_vertex.return_value = "This is not valid JSON but should be handled gracefully."
-        
+
         # Create a mock Pub/Sub event
         event_data = {
             'content_id': 'test_content_1',
@@ -190,22 +190,22 @@ class TestContentGeneration(unittest.TestCase):
         event = {
             'data': base64.b64encode(json.dumps(event_data).encode('utf-8'))
         }
-        
+
         # Act
         generate_content_plan(event, None)
-        
+
         # Assert
         # Verify Firestore update
         mock_content_ref.update.assert_called_once()
-        
+
         # Verify the update contains the raw text as a fallback
         update_args = mock_content_ref.update.call_args[0][0]
         self.assertIn('content.plan', update_args)
         self.assertEqual(update_args['content.plan']['raw_plan'], "This is not valid JSON but should be handled gracefully.")
-        
+
         # Verify the event was still published
         mock_publish.assert_called_once()
-    
+
     @patch('cloud_function.main.call_vertex_ai')
     @patch('cloud_function.main.firestore.Client')
     @patch('cloud_function.main.publish_event')
@@ -214,13 +214,13 @@ class TestContentGeneration(unittest.TestCase):
         # Arrange
         mock_db = MagicMock()
         mock_firestore.return_value = mock_db
-        
+
         mock_content_ref = MagicMock()
         mock_db.collection.return_value.document.return_value = mock_content_ref
-        
+
         # Mock the Firestore get response to return None (content not found)
         mock_content_ref.get.return_value.to_dict.return_value = None
-        
+
         # Create a mock Pub/Sub event
         event_data = {
             'content_id': 'test_content_1',
@@ -229,36 +229,36 @@ class TestContentGeneration(unittest.TestCase):
         event = {
             'data': base64.b64encode(json.dumps(event_data).encode('utf-8'))
         }
-        
+
         # Act
         generate_content_plan(event, None)
-        
+
         # Assert
         # Verify Vertex AI was not called
         mock_call_vertex.assert_not_called()
-        
+
         # Verify no Firestore update was made
         mock_content_ref.update.assert_not_called()
-        
+
         # Verify no event was published
         mock_publish.assert_not_called()
-    
+
     @patch('cloud_function.main.call_vertex_ai')
     @patch('cloud_function.main.firestore.Client')
     @patch('cloud_function.main.publish_event')
-    def test_content_plan_audience_analysis(self, mock_publish, mock_firestore, mock_call_vertex):
+    def test_content_plan_audience_analysis(self, mock_publish, mock_firestore, mock_call_vertex):  # mock_publish is used implicitly
         """TC3.1 - Audience Analysis: Test audience-specific content planning."""
         # Arrange
         mock_db = MagicMock()
         mock_firestore.return_value = mock_db
-        
+
         mock_content_ref = MagicMock()
         mock_db.collection.return_value.document.return_value = mock_content_ref
-        
+
         # Mock the Firestore get response
         plan = self.content_plans.get('plan_case_study')
         template = self.templates.get(config.ContentTypes.CASE_STUDY)
-        
+
         mock_content_data = {
             'metadata': {
                 'title': plan['title'],
@@ -269,7 +269,7 @@ class TestContentGeneration(unittest.TestCase):
             'template': template
         }
         mock_content_ref.get.return_value.to_dict.return_value = mock_content_data
-        
+
         # Mock the Vertex AI response
         mock_call_vertex.return_value = json.dumps({
             "learning_objectives": [
@@ -290,7 +290,7 @@ class TestContentGeneration(unittest.TestCase):
                 ]
             }
         })
-        
+
         # Create a mock Pub/Sub event
         event_data = {
             'content_id': 'test_content_2',
@@ -299,19 +299,18 @@ class TestContentGeneration(unittest.TestCase):
         event = {
             'data': base64.b64encode(json.dumps(event_data).encode('utf-8'))
         }
-        
+
         # Act
         generate_content_plan(event, None)
-        
+
         # Assert
         # Verify the prompt includes audience information
         mock_call_vertex.assert_called_once()
         prompt = mock_call_vertex.call_args[0][0]
         self.assertIn("Audience level: Intermediate", prompt)
-        
+
         # Verify the content plan includes audience-specific elements
         mock_content_ref.update.assert_called_once()
-        update_args = mock_content_ref.update.call_args[0][0]
         content_plan = json.loads(mock_call_vertex.return_value)
         self.assertIn("intermediate practitioners", content_plan["learning_objectives"][0])
 

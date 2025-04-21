@@ -3,6 +3,21 @@ Test environment configuration for the Agentic AI Content Creation System.
 """
 
 import os
+from pathlib import Path
+
+# Load environment variables from .env file if it exists
+try:
+    from dotenv import load_dotenv
+    # Find .env file in the test directory
+    env_path = Path(os.path.dirname(os.path.abspath(__file__))) / '.env'
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path)
+        print(f"Loaded environment variables from {env_path}")
+    else:
+        print("No .env file found. Using default or system environment variables.")
+except ImportError:
+    print("python-dotenv not installed. Using default or system environment variables.")
+    # Continue without dotenv
 
 # Test environment configuration
 TEST_PROJECT_ID = os.environ.get("TEST_PROJECT_ID", "aivibe-content-creation-test")
@@ -25,7 +40,7 @@ REVIEW_TOPIC = "review-events-test"
 
 # Cloud Run services
 RESEARCH_SERVICE_URL = os.environ.get(
-    "RESEARCH_SERVICE_URL", 
+    "RESEARCH_SERVICE_URL",
     f"https://research-service-test-{TEST_PROJECT_ID}.a.run.app"
 )
 
