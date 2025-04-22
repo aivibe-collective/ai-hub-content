@@ -42,3 +42,4 @@ yarn-error.log
 
 .git.backup
 ai-hub-content-mirror/
+.env
