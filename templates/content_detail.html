@@ -13,7 +13,18 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ content_item.title }}</h1>
-        <span class="badge {% if content_item.status == 'Completed' %}bg-success{% elif content_item.status == 'In Progress' %}bg-warning{% else %}bg-secondary{% endif %} fs-5">{{ content_item.status }}</span>
+        <div>
+            <span class="badge {% if content_item.status == 'Completed' %}bg-success{% elif content_item.status == 'In Progress' %}bg-warning{% elif content_item.status == 'Regenerating' %}bg-info{% elif content_item.status == 'Edited' %}bg-info{% elif content_item.status == 'Review Requested' %}bg-primary{% elif content_item.status == 'In Review' %}bg-primary{% elif content_item.status == 'Revision Needed' %}bg-warning{% elif content_item.status == 'Approved' %}bg-success{% elif content_item.status == 'Published' %}bg-success{% elif content_item.status == 'Archived' %}bg-secondary{% elif content_item.status == 'Failed' %}bg-danger{% else %}bg-secondary{% endif %} fs-5 me-2">{{ content_item.status }}</span>
+            <div class="btn-group me-2" role="group">
+                <a href="/content/{{ content_item.content_id }}/edit" class="btn btn-outline-primary">Edit Content</a>
+                <a href="/content/{{ content_item.content_id }}/workflow" class="btn btn-outline-info">Workflow</a>
+                <a href="/content/{{ content_item.content_id }}/attach-image" class="btn btn-outline-secondary">Attach Image</a>
+            </div>
+            <div class="btn-group" role="group">
+                <a href="/content/{{ content_item.content_id }}/versions" class="btn btn-outline-dark me-2">Version History</a>
+                <a href="/content/{{ content_item.content_id }}/regenerate" class="btn btn-primary">Regenerate</a>
+            </div>
+        </div>
     </div>
 
     <div class="row">

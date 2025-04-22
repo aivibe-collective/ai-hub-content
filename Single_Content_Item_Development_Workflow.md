@@ -122,18 +122,30 @@ This document provides a detailed, step-by-step workflow for developing a single
   - Clarity and accessibility
   - Mission pillar integration
   - Practical component effectiveness
+  - Prompt effectiveness and quality
 - **Document all feedback** in a structured format
+- **Use the AI review workflow in the UI** to:
+  - Automatically analyze content quality
+  - Check for consistency with mission pillars
+  - Identify potential gaps in source coverage
+  - Suggest improvements to structure and flow
+  - Evaluate prompt effectiveness
 
-### 7. First Revision
+### 8. First Revision
 
 - **Revise the content** based on internal feedback
 - **Track changes made** in response to each feedback item
 - **Note any areas requiring further input** or clarification
+- **Update prompts in the prompt management system** based on feedback:
+  - Store prompts in the database with version tracking
+  - Document prompt effectiveness and issues
+  - Create improved prompt variants based on feedback
+  - Tag prompts with relevant metadata for future reference
 - **Prepare the revised draft** for formal review
 
 ## Review Phase
 
-### 8. Multi-dimensional Review
+### 9. Multi-dimensional Review
 
 - **Submit the revised draft for formal review** by:
   - **Technical Reviewer(s):** Verify accuracy, robustness, and technical best practices
@@ -157,25 +169,37 @@ This document provides a detailed, step-by-step workflow for developing a single
   - Assess citation style consistency
   - Evaluate source quality and diversity
 
-### 9. Feedback Consolidation
+### 10. Feedback Consolidation
 
 - **Collect all review feedback** in a central document
 - **Categorize feedback** by type (technical, mission alignment, audience, etc.)
 - **Identify any conflicting feedback** that needs resolution
 - **Prioritize feedback items** based on impact and importance
 - **Schedule a feedback discussion** if significant issues or conflicts exist
+- **Store all references in the database** with:
+  - Complete bibliographic information
+  - Quality assessment scores (CRAAP test results)
+  - Usage context and relevance ratings
+  - Tags for topic areas and content sections
+  - Accessibility of the source (open access, subscription, etc.)
 
-### 10. Second Revision
+### 11. Second Revision
 
 - **Revise the content** based on all formal review feedback
 - **Document how each feedback item was addressed**
 - **Highlight any significant changes** for the editorial review
 - **Update practical components** based on feedback
 - **Ensure all mission pillar integration points** are strengthened
+- **Use automated regeneration based on feedback**:
+  - Feed structured feedback into the prompt system
+  - Generate alternative sections that address specific issues
+  - Compare original and regenerated content
+  - Selectively incorporate improvements
+  - Document which sections were regenerated and why
 
 ## Finalization Phase
 
-### 11. Editorial Review
+### 12. Editorial Review
 
 - **Submit the revised content for editorial review**
 - **Check for:**
@@ -186,49 +210,56 @@ This document provides a detailed, step-by-step workflow for developing a single
   - Appropriate use of visuals
   - Clear instructions for practical components
 
-### 12. Final Revision
+### 13. Final Revision
 
 - **Make final adjustments** based on editorial feedback
 - **Ensure all visual elements** are properly formatted and labeled
 - **Verify all links** to related content or external resources
 - **Finalize practical components** and ensure they are ready for use
 - **Prepare the content package** for final approval
+- **Update the prompt database** with final versions of effective prompts
 
-### 13. Final Approval
+### 14. Final Approval
 
 - **Submit the complete content package** to the Content Strategist
 - **Include:**
   - Final content draft
   - All practical components
   - Summary of review process and key changes
+  - Database of references used with quality metrics
+  - Prompt versions with effectiveness ratings
   - Any outstanding concerns or notes
 - **Obtain formal sign-off** before proceeding to publication
 
-### 14. Publication Preparation
+### 15. Publication Preparation
 
 - **Format the content** according to the Hub's visual design kit and style guide
 - **Optimize for accessibility** across different devices and screen sizes
 - **Add appropriate tags** based on mission pillars, audience, topic, etc.
 - **Create metadata** for search and discovery
 - **Prepare any promotional materials** (social media posts, newsletter blurbs, etc.)
+- **Ensure all references are properly stored** in the central reference database
 
-### 15. Publication & Dependency Update
+### 16. Publication & Dependency Update
 
 - **Publish the content** on the Hub platform
 - **Update the dependency tracking system** to mark this item as complete
 - **Notify teams working on dependent content** that this prerequisite is now available
 - **Document any lessons learned** from the development process
+- **Archive successful prompts** in the prompt library for reuse
 
 ## Post-Publication Phase
 
-### 16. Monitoring & Feedback Collection
+### 17. Monitoring & Feedback Collection
 
 - **Track user engagement metrics** (views, completion rates, time spent, etc.)
 - **Collect structured user feedback** (ratings, comments, surveys)
 - **Monitor forum discussions** related to the content
 - **Document any issues or improvement suggestions**
+- **Analyze prompt effectiveness metrics** from production use
+- **Track reference usage and quality metrics** in the database
 
-### 17. Continuous Improvement
+### 18. Continuous Improvement
 
 - **Schedule regular content reviews** (quarterly, annually, or triggered by significant updates)
 - **Update content based on:**
@@ -236,7 +267,15 @@ This document provides a detailed, step-by-step workflow for developing a single
   - New developments in the field
   - Changes to related content
   - Platform updates
+  - Prompt performance data
+  - Reference quality assessments
 - **Document all updates** in a version history
+- **Use automated regeneration** for sections that need updating:
+  - Create targeted prompts based on feedback and new requirements
+  - Generate updated content sections
+  - Review and integrate the regenerated content
+  - Update the reference database with new sources
+- **Refine prompts** based on performance metrics and feedback
 
 ## Workflow Tools & Templates
 
@@ -253,6 +292,8 @@ This document provides a detailed, step-by-step workflow for developing a single
 - **Style Guide** - For ensuring consistent writing
 - **Visual Asset Guidelines** - For creating diagrams and illustrations
 - **Source Request Log Template** - For tracking [SOURCE NEEDED] tags
+- **Prompt Management System** - For creating, versioning, and optimizing prompts
+- **Automated Regeneration Tool** - For targeted content regeneration based on feedback
 
 ### Source Management Tools
 
@@ -260,6 +301,8 @@ This document provides a detailed, step-by-step workflow for developing a single
 - **Citation Style Guides** - For formatting citations correctly
 - **Source Evaluation Matrix** - For comparing potential sources
 - **Reference Management Tools** - Zotero, Mendeley, or EndNote for citation management
+- **Reference Database** - For storing and retrieving all references with quality metrics
+- **Source Usage Analytics** - For tracking reference usage across content items
 
 ### Review Tools
 
@@ -267,6 +310,8 @@ This document provides a detailed, step-by-step workflow for developing a single
 - **Source Verification Checklist** - For validating citations and references
 - **Feedback Consolidation Template** - For organizing review input
 - **Revision Tracking Document** - For documenting changes
+- **AI Review Workflow** - For automated content quality assessment and improvement suggestions
+- **Prompt Effectiveness Analyzer** - For evaluating and improving prompt performance
 
 ### Publication Tools
 

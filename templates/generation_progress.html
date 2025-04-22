@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Generating Content: {{ content_item.title }} - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
+            <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}">{{ content_item.content_id }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Generating</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Generating Content: {{ content_item.title }}</h5>
+        </div>
+        <div class="card-body">
+            <div id="progress-container">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <strong>Model:</strong> <span id="model-name">{{ model }}</span>
+                    </div>
+                    <div>
+                        <strong>Temperature:</strong> <span id="temperature-value">{{ temperature }}</span>
+                    </div>
+                    <div>
+                        <strong>Started:</strong> <span id="start-time">{{ start_time }}</span>
+                    </div>
+                </div>
+
+                <div class="progress mb-3" style="height: 25px;">
+                    <div id="overall-progress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%;" 
+                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+
+                <div id="steps-container">
+                    <!-- Steps will be populated by JavaScript -->
+                </div>
+
+                <div id="error-container" class="alert alert-danger mt-3 d-none">
+                    <strong>Error:</strong> <span id="error-message"></span>
+                </div>
+
+                <div class="mt-4">
+                    <a href="/content/{{ content_item.content_id }}" class="btn btn-primary" id="view-content-btn" style="display: none;">View Generated Content</a>
+                    <button class="btn btn-secondary" id="cancel-btn" onclick="cancelGeneration()">Cancel Generation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Configuration
+    const contentId = "{{ content_item.content_id }}";
+    const pollInterval = 1000; // 1 second
+    let isGenerating = true;
+    let pollTimer;
+
+    // Step status icons
+    const statusIcons = {
+        'pending': '<i class="bi bi-clock text-secondary"></i>',
+        'in-progress': '<i class="bi bi-arrow-repeat text-primary"></i>',
+        'complete': '<i class="bi bi-check-circle-fill text-success"></i>',
+        'error': '<i class="bi bi-exclamation-triangle-fill text-danger"></i>'
+    };
+
+    // Initialize progress tracking
+    function initProgress() {
+        // Start polling for progress updates
+        pollProgress();
+    }
+
+    // Poll for progress updates
+    function pollProgress() {
+        fetch(`/content/${contentId}/progress`)
+            .then(response => response.json())
+            .then(data => {
+                if (Object.keys(data).length > 0) {
+                    updateProgressUI(data);
+                    
+                    // If all steps are complete or there's an error, stop polling
+                    const allComplete = data.steps.every(step => step.status === 'complete');
+                    const hasError = data.steps.some(step => step.status === 'error');
+                    
+                    if (allComplete || hasError) {
+                        isGenerating = false;
+                        clearTimeout(pollTimer);
+                        
+                        if (allComplete) {
+                            document.getElementById('view-content-btn').style.display = 'inline-block';
+                            document.getElementById('cancel-btn').style.display = 'none';
+                        }
+                    }
+                }
+                
+                // Continue polling if still generating
+                if (isGenerating) {
+                    pollTimer = setTimeout(pollProgress, pollInterval);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching progress:', error);
+                // Retry after a delay
+                pollTimer = setTimeout(pollProgress, pollInterval * 2);
+            });
+    }
+
+    // Update the progress UI
+    function updateProgressUI(progressData) {
+        // Update model and temperature
+        document.getElementById('model-name').textContent = progressData.model || 'Unknown';
+        document.getElementById('temperature-value').textContent = progressData.temperature || '0.7';
+        
+        // Format and display start time
+        const startTime = new Date(progressData.start_time);
+        document.getElementById('start-time').textContent = startTime.toLocaleTimeString();
+        
+        // Update steps
+        const stepsContainer = document.getElementById('steps-container');
+        stepsContainer.innerHTML = ''; // Clear existing steps
+        
+        // Calculate overall progress
+        const totalSteps = progressData.steps.length;
+        let completedSteps = 0;
+        
+        progressData.steps.forEach((step, index) => {
+            if (step.status === 'complete') {
+                completedSteps++;
+            } else if (step.status === 'in-progress') {
+                completedSteps += 0.5; // Count in-progress as half complete
+            }
+            
+            // Create step element
+            const stepElement = document.createElement('div');
+            stepElement.className = 'card mb-2';
+            stepElement.innerHTML = `
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            ${statusIcons[step.status] || ''} 
+                            <strong>${step.name}</strong>
+                        </div>
+                        <div class="text-muted small">${step.description || ''}</div>
+                        <div class="badge ${getBadgeClass(step.status)}">${step.status}</div>
+                    </div>
+                    ${step.error ? `<div class="text-danger small mt-1">${step.error}</div>` : ''}
+                </div>
+            `;
+            stepsContainer.appendChild(stepElement);
+        });
+        
+        // Update overall progress bar
+        const progressPercent = Math.round((completedSteps / totalSteps) * 100);
+        const progressBar = document.getElementById('overall-progress');
+        progressBar.style.width = `${progressPercent}%`;
+        progressBar.setAttribute('aria-valuenow', progressPercent);
+        progressBar.textContent = `${progressPercent}%`;
+        
+        // Show error if any
+        const errorStep = progressData.steps.find(step => step.status === 'error');
+        if (errorStep) {
+            document.getElementById('error-container').classList.remove('d-none');
+            document.getElementById('error-message').textContent = errorStep.error || 'An error occurred during content generation.';
+        } else {
+            document.getElementById('error-container').classList.add('d-none');
+        }
+    }
+    
+    // Get appropriate badge class for step status
+    function getBadgeClass(status) {
+        switch (status) {
+            case 'pending': return 'bg-secondary';
+            case 'in-progress': return 'bg-primary';
+            case 'complete': return 'bg-success';
+            case 'error': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    }
+    
+    // Cancel generation
+    function cancelGeneration() {
+        if (confirm('Are you sure you want to cancel content generation?')) {
+            isGenerating = false;
+            clearTimeout(pollTimer);
+            window.location.href = `/content/${contentId}`;
+        }
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initProgress);
+</script>
+{% endblock %}

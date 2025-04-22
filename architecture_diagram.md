@@ -1,15 +1,22 @@
 # Agentic AI Content Creation System Architecture
 
-```
+```ascii
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                 │
-│                             Google Cloud Platform                               │
+│                        AI Hub Content Creation System                           │
+│                                                                                 │
+└───────────────────────────────────┬─────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                 │
+│                             Core Components                                     │
 │                                                                                 │
 │  ┌───────────────────┐    ┌───────────────────┐    ┌───────────────────┐       │
 │  │                   │    │                   │    │                   │       │
-│  │  Cloud Functions  │    │  Vertex AI        │    │  Cloud Storage    │       │
-│  │  (Workflow        │    │  (LLM Services)   │    │  (Content &       │       │
-│  │   Orchestration)  │    │                   │    │   Assets)         │       │
+│  │  Content Workflow │    │  Google           │    │  Supabase         │       │
+│  │  (Generation &    │    │  Generative AI    │    │  (Database &      │       │
+│  │   Orchestration)  │    │  (Gemini Models)  │    │   Storage)        │       │
 │  │                   │    │                   │    │                   │       │
 │  └─────────┬─────────┘    └─────────┬─────────┘    └─────────┬─────────┘       │
 │            │                        │                        │                 │
@@ -18,8 +25,8 @@
 │                                     ▼                                          │
 │                        ┌───────────────────────────┐                           │
 │                        │                           │                           │
-│                        │  Pub/Sub                  │                           │
-│                        │  (Event Bus)              │                           │
+│                        │  Web Interface            │                           │
+│                        │  (Flask Application)      │                           │
 │                        │                           │                           │
 │                        └─────────────┬─────────────┘                           │
 │                                      │                                         │
@@ -28,9 +35,10 @@
 │            ▼                        ▼ │                        ▼              │
 │  ┌───────────────────┐    ┌───────────┴───────┐    ┌───────────────────┐      │
 │  │                   │    │                   │    │                   │      │
-│  │  Firestore        │    │  Cloud Run        │    │  BigQuery         │      │
-│  │  (Metadata &      │    │  (Specialized     │    │  (Analytics &     │      │
-│  │   State)          │    │   Services)       │    │   Reporting)      │      │
+│  │  Content Editing  │    │  Workflow         │    │  Source Collection│      │
+│  │  (Markdown Editor │    │  Management       │    │  & Documentation  │      │
+│  │   & Version       │    │  (Status Tracking │    │  (CRAAP Test &    │      │
+│  │   Control)        │    │   & Assignment)   │    │   Citation)       │      │
 │  │                   │    │                   │    │                   │      │
 │  └───────────────────┘    └───────────────────┘    └───────────────────┘      │
 │                                                                                │
@@ -39,13 +47,13 @@
                                      ▼
 ┌────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                │
-│                              External Systems                                  │
+│                              User Interfaces                                   │
 │                                                                                │
 │  ┌───────────────────┐    ┌───────────────────┐    ┌───────────────────┐      │
 │  │                   │    │                   │    │                   │      │
-│  │  Academic APIs    │    │  Citation         │    │  Web Interface    │      │
-│  │  (IEEE, ACM,      │    │  Management       │    │  (User Dashboard) │      │
-│  │   Google Scholar) │    │  (Zotero API)     │    │                   │      │
+│  │  Dashboard        │    │  Content          │    │  Search &         │      │
+│  │  (Statistics &    │    │  Management       │    │  Filtering        │      │
+│  │   Overview)       │    │  (CRUD Operations)│    │  (Content Access) │      │
 │  │                   │    │                   │    │                   │      │
 │  └───────────────────┘    └───────────────────┘    └───────────────────┘      │
 │                                                                                │
@@ -54,54 +62,70 @@
 
 ## Core Components
 
-### 1. Workflow Orchestration (Cloud Functions)
+### 1. Content Workflow
+
 - Manages the overall content creation process
-- Coordinates between different services and agents
-- Handles state management and transitions
+- Coordinates content generation with dependency management
+- Handles source collection and integration
+- Implemented in `content_workflow_supabase.py` and `generate_content_batch.py`
 
-### 2. LLM Services (Vertex AI)
-- Provides foundation models for content generation
-- Specialized models for different content types
-- Fine-tuned models for specific tasks (citation, technical content)
+### 2. Google Generative AI
 
-### 3. Content Storage (Cloud Storage)
-- Stores generated content in structured format
-- Manages assets (images, code samples, etc.)
-- Version control for content iterations
+- Provides foundation models for content generation (Gemini models)
+- Supports multiple model variants (1.5-flash, 1.5-pro, 2.0-flash, 2.5-pro-preview)
+- Handles structured JSON generation for source information
+- Implemented in `google_ai_client.py`
 
-### 4. Metadata Management (Firestore)
-- Stores content metadata and relationships
-- Tracks workflow state and progress
-- Manages user preferences and settings
+### 3. Supabase Integration
 
-### 5. Specialized Services (Cloud Run)
-- Source research and verification
-- Citation management and formatting
-- Quality assurance and compliance checking
+- Stores content inventory, prompt logs, and generation outputs
+- Manages content versions and metadata
+- Provides API for content management and retrieval
+- Implemented in `supabase_client.py`
 
-### 6. Event Bus (Pub/Sub)
-- Enables asynchronous communication between components
-- Triggers workflow steps based on events
-- Facilitates parallel processing of tasks
+### 4. Web Interface
 
-### 7. Analytics (BigQuery)
-- Tracks content quality metrics
-- Monitors system performance
-- Provides insights for optimization
+- Flask-based web application for content management
+- Provides dashboard, content inventory, and detailed views
+- Enables content editing, workflow management, and image attachment
+- Implemented in `web_view.py` with templates in `templates/`
 
-### 8. External Integrations
-- Academic databases (IEEE, ACM, Google Scholar)
-- Citation management tools (Zotero, Mendeley)
-- Web interface for user interaction
+### 5. Content Editing System
+
+- Markdown editor with preview functionality
+- Version control for content changes
+- Edit history and comparison tools
+- Implemented in the web interface
+
+### 6. Workflow Management
+
+- Tracks content through various stages (Not Started, In Progress, Edited, etc.)
+- Assigns content to users
+- Manages workflow transitions and notifications
+- Implemented in the web interface
+
+### 7. Source Collection & Documentation
+
+- Analyzes content for source needs
+- Generates and evaluates sources using CRAAP test
+- Creates properly formatted citations
+- Integrates sources into content
+
+### 8. Search & Filtering
+
+- Content search across multiple fields
+- Filtering by status, section, and other attributes
+- Quick access to relevant content items
+- Implemented in the web interface
 
 ## Data Flow
 
-1. User initiates content creation with requirements
-2. Cloud Function orchestrates the workflow
-3. Vertex AI generates initial content structure
-4. Source Collection service researches and verifies sources
-5. Vertex AI integrates sources and generates content
-6. Quality Assurance service checks content quality
-7. User reviews content through web interface
-8. Feedback incorporated and final content stored
-9. Analytics collected for continuous improvement
+1. User selects content item from inventory or creates new item
+2. Content workflow orchestrates the generation process
+3. Google Generative AI generates initial content
+4. Source Collection module researches and verifies sources
+5. Google Generative AI integrates sources into content
+6. Content is saved to local file system and metadata to Supabase
+7. User can view, edit, and manage content through web interface
+8. Content versions are tracked and can be compared
+9. Content can be regenerated with different models or parameters

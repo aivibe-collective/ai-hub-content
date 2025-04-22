@@ -50,12 +50,12 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path.startswith('/content') %}active{% endif %}" href="/content">Content Inventory</a>
+                        <a class="nav-link {% if request.path.startswith('/content') and not request.path.startswith('/content/') %}active{% endif %}" href="/content">Content Inventory</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path.startswith('/prompts') %}active{% endif %}" href="/prompts">Prompt Logs</a>
@@ -64,6 +64,10 @@
                         <a class="nav-link {% if request.path.startswith('/outputs') %}active{% endif %}" href="/outputs">Generation Outputs</a>
                     </li>
                 </ul>
+                <form class="d-flex" action="/search" method="GET">
+                    <input class="form-control me-2" type="search" placeholder="Search content..." aria-label="Search" name="q">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>
             </div>
         </div>
     </nav>

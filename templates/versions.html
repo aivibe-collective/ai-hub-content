@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Version History: {{ content_item.title }} - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
+            <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}">{{ content_item.content_id }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Version History</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Version History: {{ content_item.title }}</h1>
+        <a href="/content/{{ content_item.content_id }}" class="btn btn-primary">Back to Content</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Content Versions</h5>
+        </div>
+        <div class="card-body">
+            {% if versions %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Version</th>
+                                <th>Model</th>
+                                <th>Temperature</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for version in versions %}
+                                <tr>
+                                    <td>{{ version.version_number }}</td>
+                                    <td>{{ version.model }}</td>
+                                    <td>{{ version.temperature }}</td>
+                                    <td>{{ version.created_at }}</td>
+                                    <td>
+                                        <a href="/content/{{ content_item.content_id }}/versions/{{ version.version_number }}" class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No versions found for this content item.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

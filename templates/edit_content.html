@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Content: {{ content_item.title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
+        <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}">{{ content_item.content_id }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Edit Content: {{ content_item.title }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('edit_content', content_id=content_item.content_id) }}">
+            <div class="mb-3">
+                <label for="content_text" class="form-label">Content (Markdown)</label>
+                <textarea class="form-control" id="content_text" name="content_text" rows="20" style="font-family: monospace;">{{ content_text }}</textarea>
+                <div class="form-text">Use Markdown syntax for formatting.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="edit_notes" class="form-label">Edit Notes</label>
+                <textarea class="form-control" id="edit_notes" name="edit_notes" rows="3" placeholder="Describe the changes you made..."></textarea>
+                <div class="form-text">These notes will be saved with the version history.</div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('content_detail', content_id=content_item.content_id) }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Markdown Preview</h5>
+    </div>
+    <div class="card-body">
+        <div id="markdown-preview" class="markdown-content border p-3 rounded"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contentTextarea = document.getElementById('content_text');
+        const markdownPreview = document.getElementById('markdown-preview');
+        
+        // Initial preview
+        updatePreview();
+        
+        // Update preview on input
+        contentTextarea.addEventListener('input', updatePreview);
+        
+        function updatePreview() {
+            markdownPreview.innerHTML = marked.parse(contentTextarea.value);
+        }
+    });
+</script>
+{% endblock %}

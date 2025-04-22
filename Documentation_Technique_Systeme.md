@@ -1,87 +1,87 @@
-# Documentation Technique du Système de Création de Contenu IA
+# Technical Documentation of the AI Content Creation System
 
 ```mermaid
-%% Mise à jour du diagramme d'architecture
+%% Update of the architecture diagram
 graph TD
-    A[Interface Utilisateur] -->|Déclenchement| B[Cloud Function]
+    A[User Interface] -->|Trigger| B[Cloud Function]
     B -->|Pub/Sub| C[Vertex AI]
     B --> D[(Firestore)]
-    C -->|Génération| E[Plan de Contenu]
-    D -->|Métadonnées| F[Cloud Run]
-    F -->|Recherche| G[Sources Académiques]
+    C -->|Generation| E[Content Plan]
+    D -->|Metadata| F[Cloud Run]
+    F -->|Search| G[Academic Sources]
     F -->|Validation| H[Citations]
     G --> I[(BigQuery)]
-    H --> J[Stockage Cloud]
+    H --> J[Cloud Storage]
 ```
 
-## 1. Fonctionnalités Principales
-**Objectif** : Automatisation de la création de contenu technique avec intégration de sources académiques
+## 1. Key Features
+**Objective**: Automation of technical content creation with integration of academic sources
 
-**Fonctions clés** :
-- ✅ Workflow en 5 étapes (Initialisation → Sélection Template → Génération Plan → Recherche Sources → Génération Finale)
-- ✅ Intégration Vertex AI pour le NLP (lignes 231-235 `main.py`)
-- ✅ Système de citations automatisé avec évaluation CRAAP (lignes 264-329 `app.py`)
+**Key Functions**:
+- ✅ 5-step workflow (Initialization → Template Selection → Plan Generation → Source Search → Final Generation)
+- ✅ Vertex AI integration for NLP (lines 231-235 `main.py`)
+- ✅ Automated citation system with CRAAP evaluation (lines 264-329 `app.py`)
 
-## 2. Architecture & Conception
-**Composants** :
+## 2. Architecture & Design
+**Components**:
 ```python
-# Extrait clé de cloud_function/main.py
+# Key excerpt from cloud_function/main.py
 def initialize_content_creation(request):
-    # Validation des entrées
+    # Input validation
     if not all([content_type, title]):
-        return jsonify(error="Paramètres manquants"), 400
-    
-    # Orchestration du workflow
+        return jsonify(error="Missing parameters"), 400
+
+    # Workflow orchestration
     publish_event('content-creation-events', {
         'content_id': content_id,
         'action': 'select_template'
     })
 ```
 
-**Flux de Données** :
-1. Initialisation via API REST
-2. Stockage métadonnées dans Firestore
-3. Génération de contenu avec Vertex AI
-4. Recherche et validation des sources
-5. Publication dans Cloud Storage
+**Data Flow**:
+1. Initialization via REST API
+2. Metadata storage in Firestore
+3. Content generation with Vertex AI
+4. Source search and validation
+5. Publication in Cloud Storage
 
-## 3. Dépendances & Risques
-**Bibliothèques** :
+## 3. Dependencies & Risks
+**Libraries**:
 - `google-cloud-firestore==2.11.1`
 - `vertexai==0.4.0`
 - `flask==2.2.3`
 
-**Risques** :
-- ⚠️ Configuration CORS non restrictive (absente dans `app.py`)
-- ⚠️ Gestion des secrets via variables d'environnement (ligne 17 `app.py`)
+**Risks**:
+- ⚠️ Non-restrictive CORS configuration (missing in `app.py`)
+- ⚠️ Secrets management via environment variables (line 17 `app.py`)
 
-## 4. Analyse de Sécurité
-**Bonnes Pratiques** :
-- 🔒 Validation des entrées JSON (lignes 32-36 `main.py`)
-- 🔒 Gestion centralisée des erreurs (try/except globaux)
+## 4. Security Analysis
+**Good Practices**:
+- 🔒 JSON input validation (lines 32-36 `main.py`)
+- 🔒 Centralized error handling (global try/except)
 
-**Vulnérabilités** :
+**Vulnerabilities**:
 ```python
-# Risque potentiel dans app.py ligne 85-87
+# Potential risk in app.py lines 85-87
 try:
     source_needs = json.loads(response.text)
 except:
-    # Gestion générique des erreurs
+    # Generic error handling
 ```
 
-## 5. Améliorations Recommandées
+## 5. Recommended Improvements
 ```mermaid
 graph LR
-    A[État Actuel] --> B[Validation JSON Stricte]
-    A --> C[Cache Redis]
+    A[Current State] --> B[Strict JSON Validation]
+    A --> C[Redis Cache]
     A --> D[Monitoring]
 ```
 
-1. Implémenter des schémas JSON avec Pydantic
-2. Ajouter un système de retry pour Firestore
-3. Centraliser la configuration avec Cloud Secret Manager
+1. Implement JSON schemas with Pydantic
+2. Add a retry mechanism for Firestore
+3. Centralize configuration with Cloud Secret Manager
 
-## 6. Documentation Manquante
-- Spécifications techniques des templates de contenu
-- Journalisation détaillée des appels Vertex AI
-- Politique de gestion des erreurs de l'API
+## 6. Missing Documentation
+- Technical specifications of content templates
+- Detailed logging of Vertex AI calls
+- API error management policy

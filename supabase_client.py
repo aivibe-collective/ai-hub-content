@@ -27,6 +27,11 @@ SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 supabase: Client = None
 if SUPABASE_URL and SUPABASE_KEY:
     try:
+        # Print debug information
+        logger.info(f"Supabase URL: {SUPABASE_URL}")
+        logger.info(f"Supabase Key (first 10 chars): {SUPABASE_KEY[:10]}...")
+
+        # Try to create the client
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         logger.info("Supabase client initialized successfully")
     except Exception as e:
@@ -37,14 +42,28 @@ else:
 def is_connected():
     """Check if Supabase client is connected."""
     if not supabase:
+        logger.error("Supabase client not initialized")
         return False
 
     try:
         # Try a simple query to check connection
-        supabase.table('content_inventory').select('count', count='exact').execute()
+        logger.info("Attempting to connect to Supabase...")
+        response = supabase.table('content_inventory').select('count', count='exact').execute()
+        logger.info(f"Connection successful. Response: {response}")
         return True
     except Exception as e:
-        logger.error(f"Error connecting to Supabase: {str(e)}")
+        error_msg = str(e)
+        logger.error(f"Error connecting to Supabase: {error_msg}")
+
+        # Try to parse the error message if it's a JSON string
+        if isinstance(error_msg, str) and '{' in error_msg:
+            try:
+                import json
+                error_json = json.loads(error_msg)
+                logger.error(f"Error details: {json.dumps(error_json, indent=2)}")
+            except:
+                pass
+
         return False
 
 def create_tables():
@@ -313,6 +332,155 @@ def get_content_by_id(content_id):
     except Exception as e:
         logger.error(f"Error getting content by ID: {str(e)}")
         return None
+
+def update_content_item(content_id, data):
+    """Update content item in Supabase.
+
+    Args:
+        content_id: Content ID to update
+        data: Dictionary of fields to update
+
+    Returns:
+        Boolean indicating success
+    """
+    if not supabase:
+        logger.error("Supabase client not initialized")
+        return False
+
+    try:
+        # Add updated_at timestamp
+        update_data = data.copy()
+        update_data['updated_at'] = datetime.datetime.now().isoformat()
+
+        # Update in Supabase
+        result = supabase.table('content_inventory').update(update_data).filter('content_id', 'eq', content_id).execute()
+
+        if not result.data:
+            logger.error(f"Failed to update content item {content_id}")
+            return False
+
+        logger.info(f"Updated content item {content_id}")
+        return True
+    except Exception as e:
+        logger.error(f"Error updating content item: {str(e)}")
+        return False
+
+def get_content_versions(content_id):
+    """Get content versions from Supabase.
+
+    Args:
+        content_id: Content ID to get versions for
+
+    Returns:
+        List of content versions
+    """
+    if not supabase:
+        logger.error("Supabase client not initialized")
+        return []
+
+    try:
+        # Check if content_versions table exists
+        try:
+            # Query content_versions table
+            result = supabase.table('content_versions').select('*').filter('content_id', 'eq', content_id).order('version_number', desc=True).execute()
+
+            if not result.data:
+                logger.info(f"No content versions found for {content_id}")
+                return []
+
+            return result.data
+        except Exception as table_error:
+            if "relation \"public.content_versions\" does not exist" in str(table_error):
+                logger.warning("content_versions table does not exist. Please create it using the SQL script.")
+                return []
+            else:
+                # Re-raise if it's a different error
+                raise
+    except Exception as e:
+        logger.error(f"Error getting content versions: {str(e)}")
+        return []
+
+def save_content_version(content_id, content_text, model=None, temperature=None, metadata=None):
+    """Save a new content version.
+
+    Args:
+        content_id: Content ID
+        content_text: Content text
+        model: Model used to generate content
+        temperature: Temperature used to generate content
+        metadata: Additional metadata
+
+    Returns:
+        Version number if successful, None otherwise
+    """
+    if not supabase:
+        logger.error("Supabase client not initialized")
+        return None
+
+    try:
+        # Get latest version number
+        versions = get_content_versions(content_id)
+        version_number = 1
+        if versions:
+            version_number = versions[0]['version_number'] + 1
+
+        # Prepare data
+        data = {
+            'content_id': content_id,
+            'version_number': version_number,
+            'content_text': content_text,
+            'created_at': datetime.datetime.now().isoformat()
+        }
+
+        if model:
+            data['model'] = model
+
+        if temperature:
+            data['temperature'] = float(temperature)
+
+        if metadata:
+            data['metadata'] = json.dumps(metadata) if isinstance(metadata, dict) else metadata
+
+        try:
+            # Insert into Supabase
+            result = supabase.table('content_versions').insert(data).execute()
+
+            if not result.data:
+                logger.error(f"Failed to save content version for {content_id}")
+                return None
+
+            logger.info(f"Saved content version {version_number} for {content_id}")
+            return version_number
+        except Exception as table_error:
+            if "relation \"public.content_versions\" does not exist" in str(table_error):
+                logger.warning("content_versions table does not exist. Please create it using the SQL script.")
+                # Save to local file as fallback
+                os.makedirs('content_versions', exist_ok=True)
+                file_path = f'content_versions/{content_id}_v{version_number}.md'
+                with open(file_path, 'w') as f:
+                    f.write(content_text)
+                logger.info(f"Saved content version {version_number} for {content_id} to local file {file_path}")
+                return version_number
+            else:
+                # Re-raise if it's a different error
+                raise
+    except Exception as e:
+        logger.error(f"Error saving content version: {str(e)}")
+        return None
+
+def get_available_models():
+    """Get list of available models.
+
+    Returns:
+        List of model names
+    """
+    # This could be fetched from a database or API in the future
+    return [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-2.0-flash",
+        "gemini-2.5-pro-exp-03-25"  # Use the experimental version that has a free tier
+    ]
 
 if __name__ == '__main__':
     # Test connection

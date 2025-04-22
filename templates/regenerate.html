@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Regenerate {{ content_item.title }} - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
+            <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}">{{ content_item.content_id }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Regenerate</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Regenerate Content: {{ content_item.title }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="mb-3">
+                    <label for="model" class="form-label">Model</label>
+                    <select class="form-select" id="model" name="model" required>
+                        {% for model in models %}
+                            <option value="{{ model }}" {% if model == content_item.model %}selected{% endif %}>{{ model }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Select the model to use for content generation.</div>
+                    <div class="mt-2">
+                        <div class="card">
+                            <div class="card-body p-2">
+                                <h6 class="card-subtitle mb-2 text-muted">Model Descriptions:</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item p-1"><strong>gemini-1.5-flash</strong>: Fast and efficient model for general content generation. Good balance of speed and quality.</li>
+                                    <li class="list-group-item p-1"><strong>gemini-1.5-pro</strong>: More powerful model with better reasoning capabilities. Good for complex content.</li>
+                                    <li class="list-group-item p-1"><strong>gemini-2.0-flash</strong>: Improved version with better understanding of context and instructions.</li>
+                                    <li class="list-group-item p-1"><strong>gemini-2.5-pro-exp-03-25</strong>: Experimental version of the most advanced model. Best quality but may have usage limits.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="temperature" class="form-label">Temperature: <span class="badge bg-primary" id="tempBadge">{{ content_item.temperature|default(0.7) }}</span></label>
+                    <input type="range" class="form-range" id="temperature" name="temperature" min="0.1" max="1.0" step="0.1" value="{{ content_item.temperature|default(0.7) }}" oninput="updateTemperature(this.value)">
+                    <output id="tempOutput" class="d-none">{{ content_item.temperature|default(0.7) }}</output>
+                    <div class="form-text">Higher values make output more random, lower values make it more deterministic.</div>
+                    
+                    <div class="mt-2">
+                        <div class="card">
+                            <div class="card-body p-2">
+                                <h6 class="card-subtitle mb-2 text-muted">Temperature Guide:</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item p-1"><strong>0.1-0.3</strong>: Very deterministic. Good for factual content, technical documentation.</li>
+                                    <li class="list-group-item p-1"><strong>0.4-0.6</strong>: Balanced. Good for educational content with some creativity.</li>
+                                    <li class="list-group-item p-1"><strong>0.7</strong>: Default. Good balance of creativity and coherence for most content.</li>
+                                    <li class="list-group-item p-1"><strong>0.8-1.0</strong>: More creative and diverse. Good for brainstorming and creative content.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="force" name="force">
+                    <label class="form-check-label" for="force">Force regeneration (ignore dependencies)</label>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>Warning:</strong> This will regenerate the content and replace the current version. The current version will be saved in the version history.
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="/content/{{ content_item.content_id }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Regenerate Content</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateTemperature(value) {
+        // Update the hidden output
+        document.getElementById('tempOutput').value = value;
+        
+        // Update the badge
+        const badge = document.getElementById('tempBadge');
+        badge.textContent = value;
+        
+        // Change badge color based on temperature
+        const badgeEl = document.getElementById('tempBadge');
+        if (value <= 0.3) {
+            badgeEl.className = 'badge bg-info';
+        } else if (value <= 0.6) {
+            badgeEl.className = 'badge bg-success';
+        } else if (value <= 0.7) {
+            badgeEl.className = 'badge bg-primary';
+        } else {
+            badgeEl.className = 'badge bg-warning';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize temperature output and badge
+        const tempValue = document.getElementById('temperature').value;
+        updateTemperature(tempValue);
+    });
+</script>
+{% endblock %}

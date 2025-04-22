@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Attach Image: {{ content_item.title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
+        <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}">{{ content_item.content_id }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Attach Image</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Attach Image to: {{ content_item.title }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('attach_image', content_id=content_item.content_id) }}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="image" class="form-label">Select Image</label>
+                <input class="form-control" type="file" id="image" name="image" accept="image/png, image/jpeg, image/gif">
+                <div class="form-text">Supported formats: PNG, JPG, JPEG, GIF</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="image_description" class="form-label">Image Description</label>
+                <textarea class="form-control" id="image_description" name="image_description" rows="2" placeholder="Describe this image..."></textarea>
+                <div class="form-text">This description will be used for accessibility and as alt text when inserted into content.</div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('content_detail', content_id=content_item.content_id) }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Upload Image</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Attached Images</h5>
+        <span class="badge bg-primary">{{ images|length }} images</span>
+    </div>
+    <div class="card-body">
+        {% if images %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for image in images %}
+            <div class="col">
+                <div class="card h-100">
+                    <img src="/generated_content/images/{{ content_item.content_id }}/{{ image.filename }}" class="card-img-top" alt="{{ image.description }}">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ image.filename }}</h6>
+                        <p class="card-text">{{ image.description }}</p>
+                        <p class="text-muted small">Uploaded: {{ image.uploaded_at|format_datetime if image.uploaded_at else 'Unknown' }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-sm btn-outline-primary copy-markdown-btn" data-filename="{{ image.filename }}" data-description="{{ image.description }}">Copy Markdown</button>
+                            <a href="/generated_content/images/{{ content_item.content_id }}/{{ image.filename }}" class="btn btn-sm btn-outline-secondary" target="_blank">View Full Size</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i> No images have been attached to this content item yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preview image before upload
+        const imageInput = document.getElementById('image');
+        const imagePreview = document.createElement('div');
+        imagePreview.className = 'mt-3 d-none';
+        imagePreview.innerHTML = `
+            <h6>Preview:</h6>
+            <img id="preview-img" class="img-fluid img-thumbnail" style="max-height: 200px;">
+        `;
+        imageInput.parentNode.appendChild(imagePreview);
+        
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview-img').src = e.target.result;
+                    imagePreview.classList.remove('d-none');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.classList.add('d-none');
+            }
+        });
+        
+        // Copy markdown button functionality
+        document.querySelectorAll('.copy-markdown-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const filename = this.getAttribute('data-filename');
+                const description = this.getAttribute('data-description');
+                const markdown = `![${description}](/generated_content/images/${content_item.content_id}/${filename})`;
+                
+                navigator.clipboard.writeText(markdown).then(() => {
+                    // Change button text temporarily
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.classList.remove('btn-success');
+                        this.classList.add('btn-outline-primary');
+                    }, 2000);
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

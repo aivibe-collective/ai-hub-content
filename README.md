@@ -13,8 +13,11 @@ The system architecture consists of the following components:
 - **Content Workflow**: Core content generation process with dependency management
 - **Google Generative AI**: Integration with Gemini models for content generation
 - **Supabase**: Database for content inventory, prompt logs, and generation outputs
-- **Web Interface**: Flask-based UI for viewing and managing content
+- **Web Interface**: Flask-based UI for viewing, managing, and editing content
 - **Source Collection Module**: Ensures proper citation and referencing
+- **Content Editing System**: Allows for manual editing with version control
+- **Workflow Management**: Tracks content through various stages of development
+- **Image Attachment**: Supports adding images to content with metadata
 
 ## Core Components
 
@@ -32,7 +35,7 @@ The content workflow is implemented in `content_workflow_supabase.py` and `gener
 The Google AI integration is implemented in `google_ai_client.py`, which provides:
 
 - A unified interface for interacting with Google's Generative AI API
-- Support for different Gemini models (1.5-flash, 2.5-pro, etc.)
+- Support for different Gemini models (1.5-flash, 1.5-pro, 2.0-flash, 2.5-pro-preview-03-25)
 - JSON generation capabilities for structured data
 - Fallback to Node.js implementation if needed
 
@@ -42,18 +45,23 @@ The Supabase integration is implemented in `supabase_client.py`, which provides:
 
 - Content inventory management
 - Prompt and output logging
-- Content file storage
-- Status tracking
+- Content file storage and version control
+- Status tracking and workflow management
+- User assignment and metadata storage
 
 ### Web Interface
 
 The web interface is implemented in `web_view.py`, which provides:
 
 - Dashboard with content statistics
-- Content inventory browser
+- Content inventory browser with search and filtering
 - Prompt log viewer
 - Generation output viewer
 - Detailed views of content items
+- Content editing with Markdown preview
+- Workflow management interface
+- Image attachment and management
+- Version history and comparison
 
 ## Source Collection and Documentation Module
 
@@ -63,14 +71,16 @@ A key component of the system is the Source Collection and Documentation Module,
 2. Generates high-quality academic sources relevant to the content
 3. Creates properly formatted citations in APA format
 4. Integrates sources into content with appropriate metadata
+5. Evaluates sources using the CRAAP test (Currency, Relevance, Authority, Accuracy, Purpose)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.12 or higher
+- Python 3.9 or higher
 - Supabase account and project
 - Google AI API key (for Gemini models)
+- Node.js (optional, for fallback implementation)
 
 ### Setup
 
@@ -94,10 +104,31 @@ A key component of the system is the Source Collection and Documentation Module,
    # Edit .env with your Supabase and Google AI credentials
    ```
 
-4. Import content inventory:
+   Required environment variables:
+   - `SUPABASE_URL`: Your Supabase project URL
+   - `SUPABASE_KEY`: Your Supabase API key
+   - `GOOGLE_GENAI_API_KEY`: Your Google Generative AI API key
+   - `FLASK_SECRET_KEY`: Secret key for Flask sessions
+
+4. Create database tables:
+
+   ```bash
+   # Run the SQL scripts in your Supabase SQL editor
+   # First create_tables.sql, then sql/create_content_versions_table.sql
+   ```
+
+5. Import content inventory:
 
    ```bash
    python supabase_client.py
+   ```
+
+6. Create necessary directories:
+
+   ```bash
+   mkdir -p generated_content/images
+   mkdir -p content_versions
+   mkdir -p templates
    ```
 
 ### Usage
@@ -122,25 +153,66 @@ To reset all content and regenerate with a different model:
 python generate_content_batch.py --reset-all --model "gemini-2.5-pro-preview-03-25" --force
 ```
 
-#### View Content
+#### Web Interface
 
-To view generated content through the web interface:
+To run the web interface:
 
 ```bash
-python web_view.py
+python web_view.py --port 8081
 ```
 
 Then open [http://127.0.0.1:8081](http://127.0.0.1:8081) in your browser.
 
+The web interface provides:
+
+- **Dashboard**: Overview of content statistics
+- **Content Inventory**: Browse and search all content items
+- **Content Detail**: View, edit, and manage individual content items
+- **Content Editing**: Edit content with Markdown preview
+- **Workflow Management**: Update content status and assign users
+- **Image Attachment**: Add images to content
+- **Version History**: View and compare content versions
+
 ## Testing
 
-The system includes comprehensive test coverage:
+The system includes test coverage for core components:
 
 ```bash
 python -m unittest discover test
 ```
 
-For more detailed test information, see [test/README.md](test/README.md).
+Recommended tests to implement:
+
+- Unit tests for utility functions
+- Integration tests for Supabase client
+- Integration tests for Google AI client
+- End-to-end tests for content generation workflow
+- UI tests for web interface
+
+## Project Structure
+
+```
+.
+├── content_workflow_supabase.py  # Content generation workflow
+├── create_tables.sql             # Main database schema
+├── generate_content_batch.py     # Batch content generation
+├── google_ai_client.py           # Google AI integration
+├── requirements.txt              # Python dependencies
+├── supabase_client.py            # Supabase integration
+├── web_view.py                   # Web interface
+├── generated_content/            # Generated content files
+│   └── images/                   # Attached images
+├── content_versions/             # Content version history
+├── sql/                          # Additional SQL scripts
+└── templates/                    # HTML templates for web interface
+    ├── base.html                 # Base template
+    ├── content.html              # Content inventory page
+    ├── content_detail.html       # Content detail page
+    ├── edit_content.html         # Content editing page
+    ├── content_workflow.html     # Workflow management page
+    ├── attach_image.html         # Image attachment page
+    └── search_results.html       # Search results page
+```
 
 ## License
 
@@ -151,3 +223,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - The AI Community & Sustainability Hub team
 - Google Generative AI team
 - Supabase team
+- Flask and Bootstrap contributors
