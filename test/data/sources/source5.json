@@ -1,0 +1,12 @@
+{
+  "id": "source5",
+  "title": "Outdated AI Information",
+  "authors": [
+    "Legacy Researcher"
+  ],
+  "publication": "Journal of Historical AI",
+  "year": 2010,
+  "url": "https://example.com/outdated",
+  "type": "academic_paper",
+  "content_snippet": "Neural networks will never be practical for commercial applications due to computational limitations."
+}

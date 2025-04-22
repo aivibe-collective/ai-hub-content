@@ -1,0 +1,9 @@
+{
+  "id": "feedback2",
+  "content_id": "learning_module_1",
+  "reviewer_id": "mission_reviewer1",
+  "section": "Responsible AI & Sustainability in Practice",
+  "feedback": "The section on environmental impact is well-written but could benefit from more specific examples of energy-efficient model deployment.",
+  "severity": "medium",
+  "status": "open"
+}

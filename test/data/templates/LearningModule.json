@@ -1,0 +1,13 @@
+{
+  "type": "LearningModule",
+  "content": "# Learning Module Template\n\n**1. Introduction & Context:**\nProvide an overview of the topic and why it matters.\n\n**2. Core Concepts:**\nExplain the fundamental concepts and principles.\n\n**3. Practical Applications:**\nShow how the concepts are applied in real-world scenarios.\n\n**4. Hands-on Exercise:**\nInclude interactive elements for practical learning.\n\n**5. Responsible AI & Sustainability in Practice:**\nAddress ethical considerations and sustainability aspects.\n\n**6. Further Resources:**\nProvide additional reading and learning materials.",
+  "audience_levels": ["Beginner", "Intermediate", "Expert"],
+  "sections": [
+    "1. Introduction & Context",
+    "2. Core Concepts",
+    "3. Practical Applications",
+    "4. Hands-on Exercise",
+    "5. Responsible AI & Sustainability in Practice",
+    "6. Further Resources"
+  ]
+}

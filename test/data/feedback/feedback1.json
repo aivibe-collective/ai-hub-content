@@ -1,0 +1,9 @@
+{
+  "id": "feedback1",
+  "content_id": "learning_module_1",
+  "reviewer_id": "tech_reviewer1",
+  "section": "Core Concepts",
+  "feedback": "The explanation of transformer architecture is technically inaccurate. The attention mechanism description should be revised.",
+  "severity": "high",
+  "status": "open"
+}

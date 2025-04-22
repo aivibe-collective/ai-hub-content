@@ -1,0 +1,13 @@
+{
+  "type": "ToolGuide",
+  "content": "# Tool Guide Template\n\n**1. Tool Overview:**\nIntroduce the tool and its purpose.\n\n**2. Getting Started:**\nProvide setup and installation instructions.\n\n**3. Basic Usage:**\nExplain fundamental operations and commands.\n\n**4. Advanced Features:**\nDetail more complex capabilities and use cases.\n\n**5. Best Practices:**\nShare recommendations for optimal use.\n\n**6. Troubleshooting:**\nAddress common issues and their solutions.",
+  "audience_levels": ["Beginner", "Intermediate", "Expert"],
+  "sections": [
+    "1. Tool Overview",
+    "2. Getting Started",
+    "3. Basic Usage",
+    "4. Advanced Features",
+    "5. Best Practices",
+    "6. Troubleshooting"
+  ]
+}

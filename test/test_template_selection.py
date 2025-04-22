@@ -8,11 +8,14 @@ import unittest
 from unittest.mock import patch, MagicMock
 import sys
 
-# Add the parent directory to the path to import the cloud_function module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the parent directory to the path to import modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Import the module under test
 from cloud_function.utils import get_template
-from test import config
+
+# Import test configuration
+from test.config import ContentTypes, AudienceLevels, TEST_DATA_DIR, CONTENT_PLANS_DIR, TEMPLATES_DIR
 
 class TestTemplateSelection(unittest.TestCase):
     """Test cases for the Template Selection component."""
@@ -21,17 +24,17 @@ class TestTemplateSelection(unittest.TestCase):
         """Set up test fixtures."""
         # Load test content plans
         self.content_plans = {}
-        for filename in os.listdir(config.CONTENT_PLANS_DIR):
+        for filename in os.listdir(CONTENT_PLANS_DIR):
             if filename.endswith('.json'):
-                with open(os.path.join(config.CONTENT_PLANS_DIR, filename), 'r') as f:
+                with open(os.path.join(CONTENT_PLANS_DIR, filename), 'r') as f:
                     plan = json.load(f)
                     self.content_plans[plan['id']] = plan
 
         # Load test templates
         self.templates = {}
-        for filename in os.listdir(config.TEMPLATES_DIR):
+        for filename in os.listdir(TEMPLATES_DIR):
             if filename.endswith('.json'):
-                with open(os.path.join(config.TEMPLATES_DIR, filename), 'r') as f:
+                with open(os.path.join(TEMPLATES_DIR, filename), 'r') as f:
                     template = json.load(f)
                     self.templates[template['type']] = template
 
@@ -48,7 +51,7 @@ class TestTemplateSelection(unittest.TestCase):
 
         # Set up the mock to return a template for LearningModule
         mock_template = MagicMock()
-        mock_template.to_dict.return_value = self.templates.get(config.ContentTypes.LEARNING_MODULE)
+        mock_template.to_dict.return_value = self.templates.get(ContentTypes.LEARNING_MODULE)
         mock_query.stream.return_value = [mock_template]
 
         # Act
@@ -57,10 +60,10 @@ class TestTemplateSelection(unittest.TestCase):
 
         # Assert
         self.assertIsNotNone(result)
-        self.assertEqual(result['type'], config.ContentTypes.LEARNING_MODULE)
+        self.assertEqual(result['type'], ContentTypes.LEARNING_MODULE)
         mock_db.collection.assert_called_once()
-        mock_db.collection().where.assert_called_once_with('type', '==', config.ContentTypes.LEARNING_MODULE)
-        mock_query.where.assert_called_once_with('audience_levels', 'array_contains', config.AudienceLevels.BEGINNER)
+        mock_db.collection().where.assert_called_once_with('type', '==', ContentTypes.LEARNING_MODULE)
+        mock_query.where.assert_called_once_with('audience_levels', 'array_contains', AudienceLevels.BEGINNER)
 
     @patch('cloud_function.utils.firestore.Client')
     def test_invalid_template_selection(self, mock_firestore):
@@ -75,7 +78,7 @@ class TestTemplateSelection(unittest.TestCase):
 
         # Set up the mock to return a template for BlogPost
         mock_template = MagicMock()
-        mock_template.to_dict.return_value = self.templates.get(config.ContentTypes.BLOG_POST)
+        mock_template.to_dict.return_value = self.templates.get(ContentTypes.BLOG_POST)
         mock_query.stream.return_value = [mock_template]
 
         # Act
@@ -84,9 +87,9 @@ class TestTemplateSelection(unittest.TestCase):
 
         # Assert
         self.assertIsNotNone(result)
-        self.assertNotEqual(result['type'], config.ContentTypes.CASE_STUDY)
+        self.assertNotEqual(result['type'], ContentTypes.CASE_STUDY)
         mock_db.collection.assert_called_once()
-        mock_db.collection().where.assert_called_once_with('type', '==', config.ContentTypes.CASE_STUDY)
+        mock_db.collection().where.assert_called_once_with('type', '==', ContentTypes.CASE_STUDY)
 
     @patch('cloud_function.utils.firestore.Client')
     def test_no_template_found(self, mock_firestore):
@@ -157,17 +160,17 @@ class TestTemplateSelection(unittest.TestCase):
 
         # Set up the mock to return a template for LearningModule
         mock_template = MagicMock()
-        mock_template.to_dict.return_value = self.templates.get(config.ContentTypes.LEARNING_MODULE)
+        mock_template.to_dict.return_value = self.templates.get(ContentTypes.LEARNING_MODULE)
         mock_query.stream.return_value = [mock_template]
 
         # Act
-        result = get_template(config.ContentTypes.LEARNING_MODULE, config.AudienceLevels.EXPERT)
+        result = get_template(ContentTypes.LEARNING_MODULE, AudienceLevels.EXPERT)
 
         # Assert
         self.assertIsNotNone(result)
         mock_db.collection.assert_called_once()
-        mock_db.collection().where.assert_called_once_with('type', '==', config.ContentTypes.LEARNING_MODULE)
-        mock_query.where.assert_called_once_with('audience_levels', 'array_contains', config.AudienceLevels.EXPERT)
+        mock_db.collection().where.assert_called_once_with('type', '==', ContentTypes.LEARNING_MODULE)
+        mock_query.where.assert_called_once_with('audience_levels', 'array_contains', AudienceLevels.EXPERT)
 
     @patch('cloud_function.utils.firestore.Client')
     def test_no_audience_level(self, mock_firestore):
@@ -181,16 +184,16 @@ class TestTemplateSelection(unittest.TestCase):
 
         # Set up the mock to return a template for BlogPost
         mock_template = MagicMock()
-        mock_template.to_dict.return_value = self.templates.get(config.ContentTypes.BLOG_POST)
+        mock_template.to_dict.return_value = self.templates.get(ContentTypes.BLOG_POST)
         mock_query.stream.return_value = [mock_template]
 
         # Act
-        result = get_template(config.ContentTypes.BLOG_POST, None)
+        result = get_template(ContentTypes.BLOG_POST, None)
 
         # Assert
         self.assertIsNotNone(result)
         mock_db.collection.assert_called_once()
-        mock_db.collection().where.assert_called_once_with('type', '==', config.ContentTypes.BLOG_POST)
+        mock_db.collection().where.assert_called_once_with('type', '==', ContentTypes.BLOG_POST)
         # Should not call where again for audience level
         mock_query.where.assert_not_called()
 

@@ -1,0 +1,14 @@
+{
+  "id": "source4",
+  "title": "Sustainable AI: Environmental Implications, Challenges and Opportunities",
+  "authors": [
+    "Emma Strubell",
+    "Ananya Ganesh",
+    "Andrew McCallum"
+  ],
+  "publication": "ACM Conference on Fairness, Accountability, and Transparency",
+  "year": 2020,
+  "doi": "10.1145/3442188.3445922",
+  "type": "academic_paper",
+  "content_snippet": "Training a single large language model can emit as much carbon as five cars in their lifetimes."
+}

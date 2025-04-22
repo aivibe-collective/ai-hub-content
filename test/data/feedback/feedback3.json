@@ -1,0 +1,9 @@
+{
+  "id": "feedback3",
+  "content_id": "case_study_1",
+  "reviewer_id": "audience_reviewer1",
+  "section": "Introduction & Context",
+  "feedback": "The introduction assumes too much prior knowledge for an intermediate audience. Consider adding more background on RAG.",
+  "severity": "medium",
+  "status": "open"
+}

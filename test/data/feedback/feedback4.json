@@ -1,0 +1,9 @@
+{
+  "id": "feedback4",
+  "content_id": "case_study_1",
+  "reviewer_id": "source_reviewer1",
+  "section": "Results & Analysis",
+  "feedback": "The claim about 40% efficiency improvement needs a citation. Also, the McKinsey source is cited incorrectly.",
+  "severity": "high",
+  "status": "open"
+}

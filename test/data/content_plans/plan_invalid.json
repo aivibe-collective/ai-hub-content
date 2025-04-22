@@ -1,0 +1,12 @@
+{
+  "id": "plan_invalid",
+  "title": "Invalid Content Plan",
+  "content_type": "InvalidType",
+  "audience_level": "Unknown",
+  "mission_pillars": [],
+  "description": "A content plan with invalid parameters for testing error handling.",
+  "objectives": [
+    "Test system response to invalid content type",
+    "Verify error handling for unknown audience level"
+  ]
+}

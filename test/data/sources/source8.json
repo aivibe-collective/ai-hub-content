@@ -1,0 +1,12 @@
+{
+  "id": "source8",
+  "title": "Malformed URL Source",
+  "authors": [
+    "Valid Researcher"
+  ],
+  "publication": "Valid Journal",
+  "year": 2023,
+  "url": "htp:/malformed-url",
+  "type": "academic_paper",
+  "content_snippet": "This source has a malformed URL for testing error handling."
+}

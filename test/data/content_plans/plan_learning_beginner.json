@@ -1,0 +1,16 @@
+{
+  "id": "plan_learning_beginner",
+  "title": "Introduction to Generative AI",
+  "content_type": "LearningModule",
+  "audience_level": "Beginner",
+  "mission_pillars": [
+    "ResponsibleAI",
+    "Inclusion"
+  ],
+  "description": "A beginner-friendly introduction to generative AI concepts and applications.",
+  "objectives": [
+    "Understand the basic principles of generative AI",
+    "Identify common generative AI applications",
+    "Recognize ethical considerations in generative AI"
+  ]
+}

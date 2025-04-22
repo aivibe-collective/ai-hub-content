@@ -1,0 +1,17 @@
+{
+  "id": "source6",
+  "title": "Biased AI Research",
+  "authors": [
+    "Biased Author"
+  ],
+  "publication": "Commercial AI Vendor Blog",
+  "year": 2023,
+  "url": "https://example.com/biased-research",
+  "type": "blog_post",
+  "content_snippet": "Our proprietary AI system outperforms all others by at least 200% on all benchmarks.",
+  "bias_indicators": [
+    "commercial interest",
+    "no methodology details",
+    "extreme claims"
+  ]
+}

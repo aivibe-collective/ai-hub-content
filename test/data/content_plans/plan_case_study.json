@@ -1,0 +1,16 @@
+{
+  "id": "plan_case_study",
+  "title": "Implementing RAG for Customer Support",
+  "content_type": "CaseStudy",
+  "audience_level": "Intermediate",
+  "mission_pillars": [
+    "Expertise",
+    "Sustainability"
+  ],
+  "description": "A case study on implementing Retrieval Augmented Generation for customer support.",
+  "objectives": [
+    "Demonstrate RAG implementation in a real-world scenario",
+    "Analyze performance improvements in customer support",
+    "Evaluate cost and sustainability impacts"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "BlogPost",
+  "content": "# Blog Post Template\n\n**1. Engaging Title:**\nCreate an attention-grabbing title.\n\n**2. Introduction:**\nHook the reader and introduce the topic.\n\n**3. Main Content:**\nDevelop your key points with supporting evidence.\n\n**4. Practical Takeaways:**\nProvide actionable insights for readers.\n\n**5. Conclusion:**\nSummarize key points and provide a call to action.",
+  "audience_levels": ["Beginner", "Intermediate", "Expert", "General"],
+  "sections": [
+    "1. Engaging Title",
+    "2. Introduction",
+    "3. Main Content",
+    "4. Practical Takeaways",
+    "5. Conclusion"
+  ]
+}

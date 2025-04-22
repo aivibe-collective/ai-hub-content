@@ -1,0 +1,13 @@
+{
+  "type": "CaseStudy",
+  "content": "# Case Study Template\n\n**1. Introduction & Context:**\nProvide background information and context for the case.\n\n**2. Challenge:**\nDescribe the problem or challenge that needed to be addressed.\n\n**3. Solution Design:**\nExplain the approach and methodology used.\n\n**4. Implementation:**\nDetail how the solution was implemented.\n\n**5. Results & Analysis:**\nPresent outcomes and analyze the results.\n\n**6. Lessons Learned:**\nShare insights and takeaways from the experience.",
+  "audience_levels": ["Beginner", "Intermediate", "Expert"],
+  "sections": [
+    "1. Introduction & Context",
+    "2. Challenge",
+    "3. Solution Design",
+    "4. Implementation",
+    "5. Results & Analysis",
+    "6. Lessons Learned"
+  ]
+}

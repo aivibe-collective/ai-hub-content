@@ -1,0 +1,15 @@
+{
+  "id": "plan_blog_post",
+  "title": "The Future of AI Regulation",
+  "content_type": "BlogPost",
+  "audience_level": "General",
+  "mission_pillars": [
+    "ResponsibleAI"
+  ],
+  "description": "A blog post discussing emerging trends in AI regulation globally.",
+  "objectives": [
+    "Summarize current AI regulatory frameworks",
+    "Analyze emerging trends in AI governance",
+    "Discuss implications for AI practitioners"
+  ]
+}

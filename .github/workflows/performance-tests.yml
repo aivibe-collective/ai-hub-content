@@ -1,0 +1,239 @@
+name: Performance Tests
+
+on:
+  # Run on schedule (twice a week)
+  schedule:
+    - cron: '0 0 * * 1,4'  # Monday and Thursday at midnight UTC
+  
+  # Run on pull requests to main branch
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'cloud_function/**'
+      - 'cloud_run/**'
+      - 'test/performance/**'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      test_category:
+        description: 'Test category to run (load, stress, endurance, api_response, or all)'
+        required: true
+        default: 'api_response'
+      environment:
+        description: 'Environment to run tests against (dev, staging, prod)'
+        required: true
+        default: 'dev'
+
+env:
+  PYTHON_VERSION: '3.9'
+  API_BASE_URL_DEV: 'https://dev-api.aihub-content.com'
+  API_BASE_URL_STAGING: 'https://staging-api.aihub-content.com'
+  API_BASE_URL_PROD: 'https://api.aihub-content.com'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      api_base_url: ${{ steps.set-url.outputs.api_base_url }}
+      test_category: ${{ steps.set-category.outputs.test_category }}
+    
+    steps:
+      - name: Set API URL
+        id: set-url
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            if [ "${{ github.event.inputs.environment }}" == "prod" ]; then
+              echo "api_base_url=${{ env.API_BASE_URL_PROD }}" >> $GITHUB_OUTPUT
+            elif [ "${{ github.event.inputs.environment }}" == "staging" ]; then
+              echo "api_base_url=${{ env.API_BASE_URL_STAGING }}" >> $GITHUB_OUTPUT
+            else
+              echo "api_base_url=${{ env.API_BASE_URL_DEV }}" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "api_base_url=${{ env.API_BASE_URL_DEV }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Set Test Category
+        id: set-category
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "test_category=${{ github.event.inputs.test_category }}" >> $GITHUB_OUTPUT
+          else
+            echo "test_category=api_response" >> $GITHUB_OUTPUT
+          fi
+
+  api_response_tests:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.test_category == 'api_response' || needs.prepare.outputs.test_category == 'all' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/performance/requirements.txt
+      
+      - name: Set up performance test environment
+        run: |
+          python test/performance/setup_perf_env.py --api-base-url ${{ needs.prepare.outputs.api_base_url }}
+      
+      - name: Run API response time tests
+        run: |
+          python test/performance/run_performance_tests.py --category api_response --iterations 5
+      
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-response-test-reports
+          path: test/performance/reports/api_response
+          retention-days: 14
+
+  load_tests:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.test_category == 'load' || needs.prepare.outputs.test_category == 'all' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/performance/requirements.txt
+      
+      - name: Set up performance test environment
+        run: |
+          python test/performance/setup_perf_env.py --api-base-url ${{ needs.prepare.outputs.api_base_url }}
+      
+      - name: Run load tests
+        run: |
+          python test/performance/run_performance_tests.py --category load --users 20
+      
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: load-test-reports
+          path: test/performance/reports/load
+          retention-days: 14
+
+  stress_tests:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.test_category == 'stress' || needs.prepare.outputs.test_category == 'all' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/performance/requirements.txt
+      
+      - name: Set up performance test environment
+        run: |
+          python test/performance/setup_perf_env.py --api-base-url ${{ needs.prepare.outputs.api_base_url }}
+      
+      - name: Run stress tests
+        run: |
+          python test/performance/run_performance_tests.py --category stress --start-users 5 --max-users 30 --step-size 5
+      
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: stress-test-reports
+          path: test/performance/reports/stress
+          retention-days: 14
+
+  endurance_tests:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.test_category == 'endurance' || needs.prepare.outputs.test_category == 'all' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/performance/requirements.txt
+      
+      - name: Set up performance test environment
+        run: |
+          python test/performance/setup_perf_env.py --api-base-url ${{ needs.prepare.outputs.api_base_url }}
+      
+      - name: Run endurance tests
+        run: |
+          python test/performance/run_performance_tests.py --category endurance --duration 600 --sampling-interval 30
+      
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: endurance-test-reports
+          path: test/performance/reports/endurance
+          retention-days: 14
+
+  report:
+    needs: [prepare, api_response_tests, load_tests, stress_tests, endurance_tests]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: test/performance/reports
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib pandas tabulate jinja2
+      
+      - name: Generate consolidated report
+        run: |
+          python test/performance/generate_consolidated_report.py
+      
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v3
+        with:
+          name: consolidated-performance-report
+          path: test/performance/reports/consolidated_report
+          retention-days: 30
+      
+      - name: Publish report to GitHub Pages
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./test/performance/reports/consolidated_report
+          destination_dir: performance-reports/${{ github.run_number }}
+          keep_files: true
