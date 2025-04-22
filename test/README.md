@@ -155,6 +155,8 @@ python test/cleanup_test_env.py --cloud
 - **Test Summary**: For a summary of the test implementation, see [TEST_SUMMARY.md](TEST_SUMMARY.md).
 - **Integration Tests**: For information about integration tests, see [integration/README.md](integration/README.md).
 - **Performance Tests**: For information about performance tests, see [performance/README.md](performance/README.md).
+- **Code Coverage**: For information about code coverage, see [COVERAGE.md](COVERAGE.md).
+- **Mock Tests**: For information about mock tests, see [MOCK_TEST_COVERAGE.md](MOCK_TEST_COVERAGE.md).
 
 ## Test Data
 

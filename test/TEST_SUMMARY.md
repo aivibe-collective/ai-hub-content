@@ -85,24 +85,66 @@ We have implemented a total of 68 test cases across 15 test modules:
     - Suggest impact metrics
     - End-to-end mission pillar integration workflow
 
-12. **Load Tests** (3 tests)
+12. **Cloud Function Integration** (4 tests)
+    - End-to-end content creation workflow
+    - Error handling in workflow
+    - Template not found handling
+    - Vertex AI error handling
+
+13. **Source Collection Integration** (4 tests)
+    - Content creation with source collection
+    - Source need identification error handling
+    - Research sources with missing content
+    - Evaluate source with invalid index
+
+14. **End-to-End Workflow Integration** (3 tests)
+    - Complete content creation workflow
+    - Content creation with source collection
+    - Content creation with mission pillar integration
+
+15. **Error Handling Integration** (8 tests)
+    - Firestore error during initialization
+    - Pub/Sub error during initialization
+    - Content not found during template selection
+    - No matching template found
+    - Vertex AI error during content plan generation
+    - Non-JSON response from Vertex AI
+    - Missing required parameters
+    - No request data
+
+16. **Load Tests** (3 tests)
     - Content creation API load test
     - Template selection API load test
     - Content plan generation API load test
 
-13. **Stress Tests** (3 tests)
+17. **Stress Tests** (3 tests)
     - Content creation API stress test
     - Source collection API stress test
     - Mission pillar integration API stress test
 
-14. **Endurance Tests** (3 tests)
+18. **Endurance Tests** (3 tests)
     - Content creation API endurance test
     - Source collection API endurance test
     - Complete workflow endurance test
 
-15. **API Response Time Tests** (2 tests)
+19. **API Response Time Tests** (2 tests)
     - Content creation API response time test
     - Source collection API response time test
+
+20. **Component Performance Tests** (5 tests)
+    - Firestore performance test
+    - Storage performance test
+    - Pub/Sub performance test
+    - API performance test
+    - End-to-end performance test
+
+21. **Cloud Function Unit Tests** (11 tests)
+    - Initialize content creation (4 tests)
+    - Select template (2 tests)
+    - Generate content plan (2 tests)
+    - Store content metadata (2 tests)
+    - Publish event (2 tests)
+    - Call Vertex AI (3 tests)
 
 ## Test Implementation Approach
 

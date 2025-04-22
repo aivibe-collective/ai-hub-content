@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ content_item.title }} - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ content_item.content_id }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ content_item.title }}</h1>
+        <span class="badge {% if content_item.status == 'Completed' %}bg-success{% elif content_item.status == 'In Progress' %}bg-warning{% else %}bg-secondary{% endif %} fs-5">{{ content_item.status }}</span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Content Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th>Content ID</th>
+                            <td>{{ content_item.content_id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Section</th>
+                            <td>{{ content_item.section }}</td>
+                        </tr>
+                        <tr>
+                            <th>Subsection</th>
+                            <td>{{ content_item.subsection }}</td>
+                        </tr>
+                        <tr>
+                            <th>Content Type</th>
+                            <td>{{ content_item.content_type }}</td>
+                        </tr>
+                        <tr>
+                            <th>Priority</th>
+                            <td>{{ content_item.priority }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dependencies</th>
+                            <td>{{ content_item.dependencies }}</td>
+                        </tr>
+                        <tr>
+                            <th>Audience Level</th>
+                            <td>{{ content_item.audience_technical_level }}</td>
+                        </tr>
+                        <tr>
+                            <th>Audience Role</th>
+                            <td>{{ content_item.audience_role }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Mission Pillars</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th>Primary Mission Pillar 1</th>
+                            <td>{{ content_item.primary_mission_pillar_1 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Primary Mission Pillar 2</th>
+                            <td>{{ content_item.primary_mission_pillar_2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Secondary Mission Pillars</th>
+                            <td>{{ content_item.secondary_mission_pillars }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Objectives & Components</h5>
+                </div>
+                <div class="card-body">
+                    <h6>SMART Objectives</h6>
+                    <p>{{ content_item.smart_objectives }}</p>
+                    <h6>Practical Components</h6>
+                    <p>{{ content_item.practical_components }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if content_file %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Generated Content</h5>
+            </div>
+            <div class="card-body">
+                <div class="markdown-content" data-markdown="{{ content_file }}"></div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Prompt Logs</h5>
+        </div>
+        <div class="card-body">
+            {% if prompt_logs %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Temperature</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in prompt_logs %}
+                                <tr>
+                                    <td>{{ log.id[:8] }}...</td>
+                                    <td>{{ log.prompt_type }}</td>
+                                    <td>{{ log.model }}</td>
+                                    <td>{{ log.temperature }}</td>
+                                    <td>{{ log.created_at }}</td>
+                                    <td>
+                                        <a href="/prompts/{{ log.id }}" class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No prompt logs found for this content item.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Generation Outputs</h5>
+        </div>
+        <div class="card-body">
+            {% if generation_outputs %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Prompt ID</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for output in generation_outputs %}
+                                <tr>
+                                    <td>{{ output.id[:8] }}...</td>
+                                    <td>{{ output.prompt_id[:8] }}...</td>
+                                    <td>
+                                        {% if output.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ output.created_at }}</td>
+                                    <td>
+                                        <a href="/outputs/{{ output.id }}" class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No generation outputs found for this content item.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

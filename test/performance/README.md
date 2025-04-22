@@ -11,6 +11,12 @@ The performance tests are organized into the following categories:
 3. **Endurance Tests**: Measure the system's behavior over extended periods.
 4. **Scalability Tests**: Measure how the system scales with increasing load.
 5. **API Response Time Tests**: Measure the response time of individual API endpoints.
+6. **Component Performance Tests**: Measure the performance of individual components of the system.
+   - **Firestore Performance**: Measure the performance of Firestore operations.
+   - **Storage Performance**: Measure the performance of Cloud Storage operations.
+   - **Pub/Sub Performance**: Measure the performance of Pub/Sub operations.
+   - **API Performance**: Measure the performance of API operations.
+   - **End-to-End Performance**: Measure the performance of the complete workflow.
 
 ## Test Metrics
 
@@ -116,15 +122,15 @@ class MyPerformanceTest(PerformanceTest):
     def setup(self):
         # Set up test resources
         pass
-        
+
     def run(self):
         # Run the test
         pass
-        
+
     def cleanup(self):
         # Clean up test resources
         pass
-        
+
     def report(self):
         # Generate test report
         pass

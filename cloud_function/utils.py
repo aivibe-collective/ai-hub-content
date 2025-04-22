@@ -140,3 +140,114 @@ def publish_event(topic, event_data):
     future = publisher.publish(topic_path, data)
 
     return future.result()
+
+def upload_content_to_storage(content_id, content_text, bucket_name=None):
+    """
+    Uploads content to Cloud Storage.
+
+    Args:
+        content_id (str): Unique identifier for the content.
+        content_text (str): The content text to upload.
+        bucket_name (str, optional): The bucket name. Defaults to environment variable.
+
+    Returns:
+        str: The GCS URI of the uploaded content.
+    """
+    # Initialize Cloud Storage client
+    storage_client = storage.Client()
+
+    # Get the bucket
+    if not bucket_name:
+        bucket_name = os.environ.get('CONTENT_BUCKET', 'aivibe-content')
+    bucket = storage_client.bucket(bucket_name)
+
+    # Create the blob
+    blob_name = f"content/{content_id}.md"
+    blob = bucket.blob(blob_name)
+
+    # Upload the content
+    blob.upload_from_string(content_text)
+
+    return f"gs://{bucket_name}/{blob_name}"
+
+def download_content_from_storage(content_id, bucket_name=None):
+    """
+    Downloads content from Cloud Storage.
+
+    Args:
+        content_id (str): Unique identifier for the content.
+        bucket_name (str, optional): The bucket name. Defaults to environment variable.
+
+    Returns:
+        str: The content text.
+    """
+    # Initialize Cloud Storage client
+    storage_client = storage.Client()
+
+    # Get the bucket
+    if not bucket_name:
+        bucket_name = os.environ.get('CONTENT_BUCKET', 'aivibe-content')
+    bucket = storage_client.bucket(bucket_name)
+
+    # Get the blob
+    blob_name = f"content/{content_id}.md"
+    blob = bucket.blob(blob_name)
+
+    # Download the content
+    content_text = blob.download_as_text()
+
+    return content_text
+
+def get_template_by_id(template_id):
+    """
+    Retrieves a template by its ID.
+
+    Args:
+        template_id (str): The template ID.
+
+    Returns:
+        dict: Template data.
+
+    Raises:
+        ValueError: If the template is not found.
+    """
+    # Initialize Firestore client
+    db = firestore.Client()
+
+    # Get the template document
+    template_ref = db.collection('templates').document(template_id)
+    template_doc = template_ref.get()
+
+    # Check if the template exists
+    if not template_doc.exists:
+        raise ValueError(f"Template {template_id} not found")
+
+    # Return the template data
+    return template_doc.to_dict()
+
+def get_content_by_id(content_id):
+    """
+    Retrieves content by its ID.
+
+    Args:
+        content_id (str): The content ID.
+
+    Returns:
+        dict: Content data.
+
+    Raises:
+        ValueError: If the content is not found.
+    """
+    # Initialize Firestore client
+    db = firestore.Client()
+
+    # Get the content document
+    content_ref = db.collection('content-items').document(content_id)
+    content_doc = content_ref.get()
+
+    # Check if the content exists
+    if not content_doc.exists:
+        raise ValueError(f"Content {content_id} not found")
+
+    # Return the content data
+    return content_doc.to_dict()

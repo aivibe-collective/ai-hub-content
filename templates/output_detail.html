@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Generation Output - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/outputs">Generation Outputs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ generation_output.id[:8] }}...</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Generation Output</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Output Details</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ generation_output.id }}</td>
+                </tr>
+                <tr>
+                    <th>Content ID</th>
+                    <td>
+                        {% if generation_output.content_id %}
+                            <a href="/content/{{ generation_output.content_id }}">{{ generation_output.content_id }}</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Prompt ID</th>
+                    <td>
+                        <a href="/prompts/{{ generation_output.prompt_id }}">{{ generation_output.prompt_id }}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>
+                        {% if generation_output.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% else %}
+                            <span class="badge bg-danger">Failed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Created At</th>
+                    <td>{{ generation_output.created_at }}</td>
+                </tr>
+                {% if generation_output.metadata %}
+                    <tr>
+                        <th>Metadata</th>
+                        <td>
+                            <pre>{{ generation_output.metadata | tojson(indent=2) }}</pre>
+                        </td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+
+    {% if prompt_log %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Prompt</h5>
+            </div>
+            <div class="card-body">
+                <table class="table mb-3">
+                    <tr>
+                        <th>Type</th>
+                        <td>{{ prompt_log.prompt_type }}</td>
+                    </tr>
+                    <tr>
+                        <th>Model</th>
+                        <td>{{ prompt_log.model }}</td>
+                    </tr>
+                    <tr>
+                        <th>Temperature</th>
+                        <td>{{ prompt_log.temperature }}</td>
+                    </tr>
+                </table>
+                <h6>Prompt Text</h6>
+                <pre>{{ prompt_log.prompt_text }}</pre>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Output Text</h5>
+        </div>
+        <div class="card-body">
+            {% if generation_output.output_text %}
+                {% if generation_output.output_text.startswith('[') and generation_output.output_text.endswith(']') %}
+                    <pre>{{ generation_output.output_text }}</pre>
+                {% else %}
+                    <div class="markdown-content" data-markdown="{{ generation_output.output_text }}"></div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-warning">
+                    No output text available.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

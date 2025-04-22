@@ -1,119 +1,146 @@
-# Agentic AI Content Creation System
+# AI Hub Content Creation System
 
-This repository contains the implementation of an agentic AI content creation system for the AI Community & Sustainability Hub, built on Google Cloud Platform.
+This repository contains the implementation of an agentic AI content creation system for the AI Community & Sustainability Hub, using Google Generative AI (Gemini) models.
 
 ## System Overview
 
-The system uses a combination of Google Cloud services to implement an agentic workflow for creating high-quality, well-sourced content. The workflow is based on the Enhanced Agentic AI Content Creation Workflow document and includes specialized modules for source collection and documentation.
+The system implements an agentic workflow for creating high-quality, well-sourced content. The workflow includes specialized modules for source collection and documentation, ensuring all content is properly cited and referenced.
 
 ### Architecture
 
 The system architecture consists of the following components:
 
-- **Cloud Functions**: Handle workflow orchestration and content generation
-- **Vertex AI**: Provides foundation models for content generation
-- **Cloud Storage**: Stores generated content and assets
-- **Firestore**: Manages metadata and workflow state
-- **Cloud Run**: Hosts specialized services for source research and citation management
-- **Pub/Sub**: Enables asynchronous communication between components
+- **Content Workflow**: Core content generation process with dependency management
+- **Google Generative AI**: Integration with Gemini models for content generation
+- **Supabase**: Database for content inventory, prompt logs, and generation outputs
+- **Web Interface**: Flask-based UI for viewing and managing content
+- **Source Collection Module**: Ensures proper citation and referencing
 
-For a detailed architecture diagram, see [architecture_diagram.md](architecture_diagram.md).
+## Core Components
 
-## Implementation
+### Content Workflow
 
-The system is implemented as a set of serverless components that work together to create content:
+The content workflow is implemented in `content_workflow_supabase.py` and `generate_content_batch.py`. These files handle:
 
-### Cloud Functions
+- Content generation based on inventory items
+- Dependency management between content items
+- Source collection and integration
+- Logging of prompts and outputs
 
-- `initialize-content-creation`: Entry point for content creation
-- `select-template`: Selects appropriate template based on content type
-- `generate-content-plan`: Creates a detailed content plan
-- `populate-sections`: Generates content for each section
-- `integrate-sources`: Incorporates sources into content
+### Google AI Integration
 
-### Cloud Run Services
+The Google AI integration is implemented in `google_ai_client.py`, which provides:
 
-- `research-service`: Handles source research, evaluation, and citation
-  - `/identify-source-needs`: Identifies statements requiring citations
-  - `/research-sources`: Finds potential sources for statements
-  - `/evaluate-source`: Evaluates sources using CRAAP criteria
-  - `/generate-citation`: Creates properly formatted citations
-  - `/integrate-source`: Integrates sources into content
+- A unified interface for interacting with Google's Generative AI API
+- Support for different Gemini models (1.5-flash, 2.5-pro, etc.)
+- JSON generation capabilities for structured data
+- Fallback to Node.js implementation if needed
+
+### Supabase Integration
+
+The Supabase integration is implemented in `supabase_client.py`, which provides:
+
+- Content inventory management
+- Prompt and output logging
+- Content file storage
+- Status tracking
+
+### Web Interface
+
+The web interface is implemented in `web_view.py`, which provides:
+
+- Dashboard with content statistics
+- Content inventory browser
+- Prompt log viewer
+- Generation output viewer
+- Detailed views of content items
 
 ## Source Collection and Documentation Module
 
 A key component of the system is the Source Collection and Documentation Module, which ensures content credibility through proper sourcing and citation. This module:
 
-1. Automatically identifies statements requiring citation
-2. Researches potential sources across academic and industry repositories
-3. Evaluates sources using the CRAAP test (Currency, Relevance, Authority, Accuracy, Purpose)
-4. Generates properly formatted citations in various styles (APA, MLA, Chicago, IEEE)
-5. Integrates sources into content with appropriate in-text citations
+1. Analyzes generated content to identify source needs
+2. Generates high-quality academic sources relevant to the content
+3. Creates properly formatted citations in APA format
+4. Integrates sources into content with appropriate metadata
 
 ## Getting Started
 
 ### Prerequisites
 
-- Google Cloud Platform account
-- Google Cloud CLI installed
-- Python 3.9 or higher
+- Python 3.12 or higher
+- Supabase account and project
+- Google AI API key (for Gemini models)
 
 ### Setup
 
 1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/aivibe-content-creation.git
-   cd aivibe-content-creation
+
+   ```bash
+   git clone https://github.com/aivibe-collective/ai-hub-content.git
+   cd ai-hub-content
    ```
 
-2. Set up Google Cloud project:
-   ```
-   gcloud projects create aivibe-content-creation
-   gcloud config set project aivibe-content-creation
+2. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
    ```
 
-3. Enable required APIs:
-   ```
-   gcloud services enable cloudfunctions.googleapis.com
-   gcloud services enable run.googleapis.com
-   gcloud services enable firestore.googleapis.com
-   gcloud services enable storage.googleapis.com
-   gcloud services enable pubsub.googleapis.com
-   gcloud services enable aiplatform.googleapis.com
+3. Set up environment variables:
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Supabase and Google AI credentials
    ```
 
-4. Deploy the system:
-   ```
-   # Make deployment scripts executable
-   chmod +x deployment/*.sh
-   
-   # Deploy Cloud Functions
-   ./deployment/cloud_function_deploy.sh
-   
-   # Deploy Cloud Run services
-   ./deployment/cloud_run_deploy.sh
+4. Import content inventory:
+
+   ```bash
+   python supabase_client.py
    ```
 
 ### Usage
 
-To create content, send a POST request to the initialize-content-creation Cloud Function:
+#### Generate Content
+
+To generate content for a specific item:
 
 ```bash
-curl -X POST https://REGION-PROJECT_ID.cloudfunctions.net/initialize-content-creation \
-  -H "Content-Type: application/json" \
-  -d '{
-    "content_type": "LearningModule",
-    "audience_level": "Beginner",
-    "title": "Introduction to Generative AI",
-    "mission_pillars": ["ResponsibleAI", "Sustainability"]
-  }'
+python content_workflow_supabase.py --content-id LRN-BEG-001 --model "gemini-2.5-pro-preview-03-25"
 ```
 
-The system will return a content ID that can be used to track the content creation process.
+To generate content in batch, respecting dependencies:
 
-## Implementation Plan
+```bash
+python generate_content_batch.py --status "Not Started" --model "gemini-2.5-pro-preview-03-25" --max-items 10
+```
 
-For a detailed implementation plan, see [implementation_plan.md](implementation_plan.md).
+To reset all content and regenerate with a different model:
+
+```bash
+python generate_content_batch.py --reset-all --model "gemini-2.5-pro-preview-03-25" --force
+```
+
+#### View Content
+
+To view generated content through the web interface:
+
+```bash
+python web_view.py
+```
+
+Then open [http://127.0.0.1:8081](http://127.0.0.1:8081) in your browser.
+
+## Testing
+
+The system includes comprehensive test coverage:
+
+```bash
+python -m unittest discover test
+```
+
+For more detailed test information, see [test/README.md](test/README.md).
 
 ## License
 
@@ -122,5 +149,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - The AI Community & Sustainability Hub team
-- Google Cloud Platform
-- Vertex AI team
+- Google Generative AI team
+- Supabase team

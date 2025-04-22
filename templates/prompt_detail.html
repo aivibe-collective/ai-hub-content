@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Prompt Log - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/prompts">Prompt Logs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ prompt_log.id[:8] }}...</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Prompt Log</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Prompt Details</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ prompt_log.id }}</td>
+                </tr>
+                <tr>
+                    <th>Content ID</th>
+                    <td>
+                        {% if prompt_log.content_id %}
+                            <a href="/content/{{ prompt_log.content_id }}">{{ prompt_log.content_id }}</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Session ID</th>
+                    <td>{{ prompt_log.session_id }}</td>
+                </tr>
+                <tr>
+                    <th>Type</th>
+                    <td>{{ prompt_log.prompt_type }}</td>
+                </tr>
+                <tr>
+                    <th>Model</th>
+                    <td>{{ prompt_log.model }}</td>
+                </tr>
+                <tr>
+                    <th>Temperature</th>
+                    <td>{{ prompt_log.temperature }}</td>
+                </tr>
+                <tr>
+                    <th>Created At</th>
+                    <td>{{ prompt_log.created_at }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Prompt Text</h5>
+        </div>
+        <div class="card-body">
+            <pre>{{ prompt_log.prompt_text }}</pre>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Generation Outputs</h5>
+        </div>
+        <div class="card-body">
+            {% if generation_outputs %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for output in generation_outputs %}
+                                <tr>
+                                    <td>{{ output.id[:8] }}...</td>
+                                    <td>
+                                        {% if output.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ output.created_at }}</td>
+                                    <td>
+                                        <a href="/outputs/{{ output.id }}" class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% for output in generation_outputs %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Output: {{ output.id[:8] }}...</h6>
+                        </div>
+                        <div class="card-body">
+                            <pre>{{ output.output_text }}</pre>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    No generation outputs found for this prompt.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
