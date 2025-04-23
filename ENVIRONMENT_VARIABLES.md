@@ -36,10 +36,10 @@ IMAGE_DIR="generated_content/images"                # Directory for attached ima
 ```env
 # Supabase Configuration
 SUPABASE_URL="https://abcdefghijklmnopqrst.supabase.co"
-SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+SUPABASE_KEY="our-supabase-api-key"
 
 # Google Generative AI Configuration
-GOOGLE_GENAI_API_KEY="AIzaSyAqd-nLSm6dLyxgrzSt50hlQ9aQcO7t6hE"
+GOOGLE_GENAI_API_KEY="your-google-genai-api-key"
 
 # Flask Configuration
 FLASK_SECRET_KEY="your-secret-key-here"
