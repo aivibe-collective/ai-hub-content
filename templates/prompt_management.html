@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Prompt Management - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Prompt Management</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Prompt Management</h1>
+        <a href="/prompt-templates/new" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Prompt Template
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Prompt Templates</h5>
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if selected_category %}{{ selected_category }}{% else %}All Categories{% endif %}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item {% if not selected_category %}active{% endif %}" href="/prompt-templates">All Categories</a></li>
+                            {% for category in categories %}
+                                <li><a class="dropdown-item {% if selected_category == category.name %}active{% endif %}" href="/prompt-templates?category={{ category.name }}">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="form-check form-switch d-inline-block ms-2">
+                        <input class="form-check-input" type="checkbox" id="showActiveOnly" {% if show_active_only %}checked{% endif %} onchange="window.location.href='/prompt-templates?category={{ selected_category }}&active=' + (this.checked ? 'true' : 'false')">
+                        <label class="form-check-label" for="showActiveOnly">Active Only</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if template_list %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Variables</th>
+                                <th>Version</th>
+                                <th>Usage</th>
+                                <th>Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for template in template_list %}
+                                <tr>
+                                    <td>
+                                        <a href="/prompt-templates/{{ template.id }}">{{ template.name }}</a>
+                                        {% if not template.is_active %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+                                    </td>
+                                    <td>{{ template.category }}</td>
+                                    <td>
+                                        {% if template.variables %}
+                                            {% for variable in template.variables %}
+                                                <span class="badge bg-info text-dark">{{ variable.name }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            <em>No variables</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ template.version }}</td>
+                                    <td>{{ template.usage_count|default(0) }}</td>
+                                    <td>
+                                        {% if template.avg_rating %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-1">{{ "%.1f"|format(template.avg_rating) }}</div>
+                                                <div class="text-warning">
+                                                    {% for i in range(5) %}
+                                                        {% if i < template.avg_rating|int %}
+                                                            <i class="bi bi-star-fill"></i>
+                                                        {% elif i < template.avg_rating|float %}
+                                                            <i class="bi bi-star-half"></i>
+                                                        {% else %}
+                                                            <i class="bi bi-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <em>No ratings</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/prompt-templates/{{ template.id }}" class="btn btn-sm btn-outline-primary">View</a>
+                                            <a href="/prompt-templates/{{ template.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                            <a href="/prompt-templates/{{ template.id }}/new-version" class="btn btn-sm btn-outline-info">New Version</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No prompt templates found. <a href="/prompt-templates/new">Create a new template</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if metrics %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Prompt Performance Metrics (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Template</th>
+                                <th>Category</th>
+                                <th>Usage Count</th>
+                                <th>Success Rate</th>
+                                <th>Avg. Rating</th>
+                                <th>Feedback Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for metric in metrics %}
+                                <tr>
+                                    <td><a href="/prompt-templates/{{ metric.template_id }}">{{ metric.template_name }}</a></td>
+                                    <td>{{ metric.category }}</td>
+                                    <td>{{ metric.usage_count }}</td>
+                                    <td>
+                                        {% if metric.usage_count > 0 %}
+                                            {{ "%.1f"|format(metric.success_count / metric.usage_count * 100) }}%
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if metric.avg_rating > 0 %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-1">{{ "%.1f"|format(metric.avg_rating) }}</div>
+                                                <div class="text-warning">
+                                                    {% for i in range(5) %}
+                                                        {% if i < metric.avg_rating|int %}
+                                                            <i class="bi bi-star-fill"></i>
+                                                        {% elif i < metric.avg_rating|float %}
+                                                            <i class="bi bi-star-half"></i>
+                                                        {% else %}
+                                                            <i class="bi bi-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <em>No ratings</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ metric.feedback_count }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any JavaScript needed for the prompt management page
+    });
+</script>
+{% endblock %}

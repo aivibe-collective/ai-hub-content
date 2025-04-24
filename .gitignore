@@ -1,23 +1,26 @@
-# IDE settings
-.vscode/settings.json
-.idx/dev.nix
+# IDE Settings
+.vscode/
+!.vscode/settings.json  # Preserve shared VS Code settings [[1]][[7]]
+.idx/
 .venv/
 
-# Environment variables
-.env
+# Environment Variables
+.env*
+!.env.example  # Optional: Track example env files
 
-# Credentials
+# Credentials (exclude sensitive files)
 *.json
-!package.json
-!package-lock.json
+!package*.json  # Allow package.json and package-lock.json [[6]]
+!*.json  # Refinement: Only exclude specific sensitive JSON files
 aivibe-72ee4-9a5c955c77f9.json
 
 # Python
+# Compiled files
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
+
+# Build artifacts
 build/
 develop-eggs/
 dist/
@@ -34,12 +37,22 @@ wheels/
 .installed.cfg
 *.egg
 
+# Caching
+.Python
+.pytest_cache/
+.mypy_cache/  # Added common cache directories
+
 # Node.js
 node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
 
-.git.backup
+# Backup and temporary files
+.git.backup/
+*.bak
+*.swp
+
+# Project-specific
 ai-hub-content-mirror/
-.env
+old_files/

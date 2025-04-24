@@ -191,28 +191,112 @@ Recommended tests to implement:
 
 ## Project Structure
 
+The project has been reorganized into a more modular structure:
+
+```bash
+ai-hub-content/
+├── app/                      # Core application code
+│   ├── __init__.py           # Make it a proper package
+│   ├── main.py               # Main entry point (renamed from app.py)
+│   ├── web_view.py           # Web interface
+│   ├── routes/               # Route definitions
+│   │   ├── __init__.py
+│   │   ├── prompt_routes.py
+│   │   ├── reference_routes.py
+│   │   └── ...
+│   └── dashboard/            # Dashboard implementations
+│       ├── __init__.py
+│       ├── dashboard.py
+│       └── simple_dashboard.py
+├── core/                     # Core functionality
+│   ├── __init__.py
+│   ├── supabase_client.py    # Database client
+│   ├── google_ai_client.py   # AI client
+│   └── ...
+├── workflows/                # Content generation workflows
+│   ├── __init__.py
+│   ├── content_workflow_supabase.py
+│   ├── content_workflow_with_references.py
+│   └── ...
+├── reference_management/     # Reference management
+│   ├── __init__.py
+│   ├── reference_management.py
+│   ├── ai_reference_processor.py
+│   └── ...
+├── prompt_management/        # Prompt management
+│   ├── __init__.py
+│   ├── prompt_management.py
+│   └── ...
+├── quality/                  # Quality control and evaluation
+│   ├── __init__.py
+│   ├── content_evaluation.py
+│   ├── source_evaluation.py
+│   └── ...
+├── batch/                    # Batch processing tools
+│   ├── __init__.py
+│   ├── generate_content_batch.py
+│   └── ...
+├── cloud_function/           # Cloud functions
+│   ├── __init__.py
+│   ├── main.py
+│   └── utils.py
+├── cloud_run/                # Cloud Run services
+│   └── ...
+├── utilities_and_fixes/      # Utilities and fixes
+│   └── ...
+├── test/                     # Tests
+│   └── ...
+├── scripts/                  # Standalone scripts
+│   ├── check_dashboard_data.py
+│   ├── check_tables.py
+│   └── ...
+├── generated_content/        # Generated content files
+│   └── images/               # Attached images
+├── content_versions/         # Content version history
+├── sql/                      # SQL scripts
+├── templates/                # HTML templates
+├── main.py                   # Main entry point
+├── setup.py                  # Package setup
+└── README.md                 # This file
 ```
-.
-├── content_workflow_supabase.py  # Content generation workflow
-├── create_tables.sql             # Main database schema
-├── generate_content_batch.py     # Batch content generation
-├── google_ai_client.py           # Google AI integration
-├── requirements.txt              # Python dependencies
-├── supabase_client.py            # Supabase integration
-├── web_view.py                   # Web interface
-├── generated_content/            # Generated content files
-│   └── images/                   # Attached images
-├── content_versions/             # Content version history
-├── sql/                          # Additional SQL scripts
-└── templates/                    # HTML templates for web interface
-    ├── base.html                 # Base template
-    ├── content.html              # Content inventory page
-    ├── content_detail.html       # Content detail page
-    ├── edit_content.html         # Content editing page
-    ├── content_workflow.html     # Workflow management page
-    ├── attach_image.html         # Image attachment page
-    └── search_results.html       # Search results page
+
+## Reorganization and Compatibility
+
+The project has been reorganized to improve modularity and maintainability. For backward compatibility, the old import paths are still supported through compatibility modules. However, you should update your imports to use the new structure.
+
+Old import:
+
+```python
+from supabase_client import is_connected
 ```
+
+New import:
+
+```python
+from core.supabase_client import is_connected
+```
+
+### Running with the New Structure
+
+```bash
+# Install in development mode
+pip install -e .
+
+# Run the main application
+python main.py
+
+# Or use the console script
+ai-hub
+```
+
+### Development Guidelines
+
+When adding new functionality, please follow the modular structure:
+
+1. Core functionality goes in the appropriate module
+2. Web routes go in app/routes/
+3. Batch processing tools go in batch/
+4. Scripts go in scripts/
 
 ## License
 

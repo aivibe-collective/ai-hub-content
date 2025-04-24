@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block title %}Reference Management - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Reference Management</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Reference Management</h1>
+        <a href="/references/new" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Reference
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">References</h5>
+                        <div>
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% if selected_type %}{{ selected_type }}{% else %}All Types{% endif %}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item {% if not selected_type %}active{% endif %}" href="/references{% if selected_category %}?category={{ selected_category }}{% endif %}">All Types</a></li>
+                                    {% for type in types %}
+                                        <li><a class="dropdown-item {% if selected_type == type.name %}active{% endif %}" href="/references?type={{ type.name }}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ type.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% if selected_category %}{{ selected_category }}{% else %}All Categories{% endif %}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item {% if not selected_category %}active{% endif %}" href="/references{% if selected_type %}?type={{ selected_type }}{% endif %}">All Categories</a></li>
+                                    {% for category in categories %}
+                                        <li><a class="dropdown-item {% if selected_category == category.id %}active{% endif %}" href="/references?category={{ category.id }}{% if selected_type %}&type={{ selected_type }}{% endif %}">{{ category.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input" type="checkbox" id="showActiveOnly" {% if show_active_only %}checked{% endif %} onchange="window.location.href='/references?{% if selected_type %}type={{ selected_type }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}active=' + (this.checked ? 'true' : 'false')">
+                                <label class="form-check-label" for="showActiveOnly">Active Only</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <form action="/references" method="get" class="row g-2">
+                            {% if selected_type %}<input type="hidden" name="type" value="{{ selected_type }}">{% endif %}
+                            {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                            {% if show_active_only %}<input type="hidden" name="active" value="true">{% endif %}
+                            
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="search" placeholder="Search references..." value="{{ search_term or '' }}">
+                                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="minQuality">Min Quality</label>
+                                    <select class="form-select" id="minQuality" name="min_quality" onchange="this.form.submit()">
+                                        <option value="" {% if not min_quality %}selected{% endif %}>Any</option>
+                                        <option value="1" {% if min_quality == 1 %}selected{% endif %}>★</option>
+                                        <option value="2" {% if min_quality == 2 %}selected{% endif %}>★★</option>
+                                        <option value="3" {% if min_quality == 3 %}selected{% endif %}>★★★</option>
+                                        <option value="4" {% if min_quality == 4 %}selected{% endif %}>★★★★</option>
+                                        <option value="5" {% if min_quality == 5 %}selected{% endif %}>★★★★★</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    {% if references %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Authors</th>
+                                        <th>Date</th>
+                                        <th>Quality</th>
+                                        <th>Categories</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reference in references %}
+                                        <tr>
+                                            <td>
+                                                <a href="/references/{{ reference.id }}">{{ reference.title }}</a>
+                                                {% if not reference.is_active %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+                                            </td>
+                                            <td>{{ reference.reference_type }}</td>
+                                            <td>{{ reference.authors }}</td>
+                                            <td>
+                                                {% if reference.publication_date %}
+                                                    {{ reference.publication_date|truncate(10, true, "") }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if reference.quality_score %}
+                                                    <div class="text-warning">
+                                                        {% for i in range(5) %}
+                                                            {% if i < reference.quality_score %}
+                                                                <i class="bi bi-star-fill"></i>
+                                                            {% else %}
+                                                                <i class="bi bi-star"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% else %}
+                                                    <em>Not rated</em>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if reference.categories %}
+                                                    {% for category in reference.categories %}
+                                                        <span class="badge bg-info text-dark">{{ category }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <em>None</em>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="/references/{{ reference.id }}" class="btn btn-sm btn-outline-primary">View</a>
+                                                    <a href="/references/{{ reference.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No references found. <a href="/references/new">Create a new reference</a>.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Reference Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>Total References:</div>
+                        <div><strong>{{ statistics.total_references }}</strong></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>Unique Types:</div>
+                        <div><strong>{{ statistics.unique_types }}</strong></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>Average Quality:</div>
+                        <div>
+                            {% if statistics.avg_quality %}
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if i < statistics.avg_quality|int %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% elif i < statistics.avg_quality|float %}
+                                            <i class="bi bi-star-half"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <em>No ratings</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>Linked to Content:</div>
+                        <div><strong>{{ statistics.linked_content_count }}</strong></div>
+                    </div>
+
+                    <h6>Type Breakdown</h6>
+                    <div class="mb-3">
+                        {% if statistics.type_breakdown %}
+                            <div class="list-group list-group-flush">
+                                {% for type in statistics.type_breakdown %}
+                                    <div class="list-group-item p-2 d-flex justify-content-between align-items-center">
+                                        <div>{{ type.reference_type }}</div>
+                                        <span class="badge bg-primary rounded-pill">{{ type.count }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p><em>No data available</em></p>
+                        {% endif %}
+                    </div>
+
+                    <h6>Category Breakdown</h6>
+                    <div>
+                        {% if statistics.category_breakdown %}
+                            <div class="list-group list-group-flush">
+                                {% for category in statistics.category_breakdown %}
+                                    <div class="list-group-item p-2 d-flex justify-content-between align-items-center">
+                                        <div>{{ category.name }}</div>
+                                        <span class="badge bg-info text-dark rounded-pill">{{ category.count }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p><em>No data available</em></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Tips</h5>
+                </div>
+                <div class="card-body">
+                    <h6>CRAAP Test for Reference Quality</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>C</strong>urrency: How recent is the information?</li>
+                        <li><strong>R</strong>elevance: How important is the information for your needs?</li>
+                        <li><strong>A</strong>uthority: Who is the creator/author/publisher?</li>
+                        <li><strong>A</strong>ccuracy: How reliable, truthful, and correct is the content?</li>
+                        <li><strong>P</strong>urpose: Why does the information exist?</li>
+                    </ul>
+                    
+                    <h6>Reference Types</h6>
+                    <p>Different reference types have different required fields. Make sure to fill in all required fields for the selected type.</p>
+                    
+                    <h6>Linking References</h6>
+                    <p>References can be linked to content items from the content detail page or from the reference detail page.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any JavaScript needed for the reference management page
+    });
+</script>
+{% endblock %}

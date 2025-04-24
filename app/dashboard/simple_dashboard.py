@@ -1,0 +1,422 @@
+#!/usr/bin/env python3
+"""
+Simple Dashboard for References and Prompts.
+
+This script creates a simple web dashboard to display references and prompts
+directly from the database without complex queries or joins.
+"""
+
+import os
+import json
+import logging
+from typing import Dict, List, Any
+from dotenv import load_dotenv
+from flask import Flask, render_template, jsonify, request
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Load environment variables
+load_dotenv()
+
+# Import our custom modules
+from supabase_client import supabase, is_connected
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    """Render the main dashboard page."""
+    return render_template('dashboard.html')
+
+@app.route('/api/references')
+def get_references():
+    """Get all references from the database."""
+    if not is_connected():
+        return jsonify({"error": "Not connected to Supabase"}), 500
+
+    try:
+        result = supabase.table('reference_sources').select('*').execute()
+        references = result.data if result.data else []
+
+        # Process references for display
+        for ref in references:
+            # Convert metadata to string if it's a dict
+            if isinstance(ref.get('metadata'), dict):
+                ref['metadata_str'] = json.dumps(ref['metadata'], indent=2)
+            else:
+                ref['metadata_str'] = str(ref.get('metadata', ''))
+
+            # Format dates for display
+            if ref.get('publication_date'):
+                try:
+                    # Try to format ISO date to YYYY-MM-DD
+                    date_str = ref['publication_date']
+                    if isinstance(date_str, str) and len(date_str) > 10:
+                        ref['publication_date'] = date_str[:10]
+                except:
+                    pass
+
+        return jsonify(references)
+
+    except Exception as e:
+        logger.error(f"Error getting references: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/prompts')
+def get_prompts():
+    """Get all prompts from the database."""
+    if not is_connected():
+        return jsonify({"error": "Not connected to Supabase"}), 500
+
+    try:
+        # Get prompt templates
+        templates_result = supabase.table('prompt_templates').select('*').execute()
+        templates = templates_result.data if templates_result.data else []
+
+        # Get prompt usage
+        usage_result = supabase.table('prompt_usage').select('*').execute()
+        usage = usage_result.data if usage_result.data else []
+
+        # Get prompt logs
+        logs_result = supabase.table('prompt_logs').select('*').execute()
+        logs = logs_result.data if logs_result.data else []
+
+        # Combine data
+        data = {
+            "templates": templates,
+            "usage": usage,
+            "logs": logs
+        }
+
+        return jsonify(data)
+
+    except Exception as e:
+        logger.error(f"Error getting prompts: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/reference_quality')
+def get_reference_quality():
+    """Get reference quality data."""
+    if not is_connected():
+        return jsonify({"error": "Not connected to Supabase"}), 500
+
+    try:
+        result = supabase.table('reference_quality').select('*').execute()
+        quality = result.data if result.data else []
+
+        return jsonify(quality)
+
+    except Exception as e:
+        logger.error(f"Error getting reference quality: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/reference_categories')
+def get_reference_categories():
+    """Get reference categories."""
+    if not is_connected():
+        return jsonify({"error": "Not connected to Supabase"}), 500
+
+    try:
+        result = supabase.table('reference_categories').select('*').execute()
+        categories = result.data if result.data else []
+
+        return jsonify(categories)
+
+    except Exception as e:
+        logger.error(f"Error getting reference categories: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    # Create templates directory if it doesn't exist
+    os.makedirs('templates', exist_ok=True)
+
+    # Create dashboard.html template
+    with open('templates/dashboard.html', 'w') as f:
+        f.write("""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Hub Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .tab-content { padding: 20px; border: 1px solid #dee2e6; border-top: none; }
+        .reference-card, .prompt-card { margin-bottom: 20px; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">AI Hub Dashboard</h1>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="references-tab" data-bs-toggle="tab" data-bs-target="#references" type="button" role="tab" aria-controls="references" aria-selected="true">References</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="prompts-tab" data-bs-toggle="tab" data-bs-target="#prompts" type="button" role="tab" aria-controls="prompts" aria-selected="false">Prompts</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="quality-tab" data-bs-toggle="tab" data-bs-target="#quality" type="button" role="tab" aria-controls="quality" aria-selected="false">Reference Quality</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab" aria-controls="categories" aria-selected="false">Categories</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- References Tab -->
+            <div class="tab-pane fade show active" id="references" role="tabpanel" aria-labelledby="references-tab">
+                <h2>References</h2>
+                <div class="row" id="references-container">
+                    <div class="col-12">
+                        <p>Loading references...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompts Tab -->
+            <div class="tab-pane fade" id="prompts" role="tabpanel" aria-labelledby="prompts-tab">
+                <h2>Prompts</h2>
+                <div class="row">
+                    <div class="col-12">
+                        <h3>Prompt Templates</h3>
+                        <div id="templates-container">
+                            <p>Loading prompt templates...</p>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <h3>Prompt Usage</h3>
+                        <div id="usage-container">
+                            <p>Loading prompt usage...</p>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <h3>Prompt Logs</h3>
+                        <div id="logs-container">
+                            <p>Loading prompt logs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reference Quality Tab -->
+            <div class="tab-pane fade" id="quality" role="tabpanel" aria-labelledby="quality-tab">
+                <h2>Reference Quality</h2>
+                <div id="quality-container">
+                    <p>Loading reference quality data...</p>
+                </div>
+            </div>
+
+            <!-- Categories Tab -->
+            <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+                <h2>Reference Categories</h2>
+                <div id="categories-container">
+                    <p>Loading categories...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fetch references
+        fetch('/api/references')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('references-container');
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="col-12"><p>No references found.</p></div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.forEach(ref => {
+                    const card = document.createElement('div');
+                    card.className = 'col-md-6 reference-card';
+                    card.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${ref.title || 'No Title'}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">${ref.authors || 'Unknown Authors'}</h6>
+                                <p class="card-text">
+                                    <strong>Publication:</strong> ${ref.publication_name || 'N/A'}<br>
+                                    <strong>Date:</strong> ${ref.publication_date || 'N/A'}<br>
+                                    <strong>Type:</strong> ${ref.reference_type || 'N/A'}<br>
+                                    <strong>URL:</strong> ${ref.url ? `<a href="${ref.url}" target="_blank">${ref.url}</a>` : 'N/A'}<br>
+                                    <strong>DOI:</strong> ${ref.doi || 'N/A'}
+                                </p>
+                                <div class="accordion" id="accordion-${ref.id}">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${ref.id}" aria-expanded="false" aria-controls="collapse-${ref.id}">
+                                                View Metadata
+                                            </button>
+                                        </h2>
+                                        <div id="collapse-${ref.id}" class="accordion-collapse collapse" data-bs-parent="#accordion-${ref.id}">
+                                            <div class="accordion-body">
+                                                <pre>${ref.metadata_str || 'No metadata'}</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching references:', error);
+                document.getElementById('references-container').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">Error loading references: ${error.message}</div>
+                    </div>
+                `;
+            });
+
+        // Fetch prompts
+        fetch('/api/prompts')
+            .then(response => response.json())
+            .then(data => {
+                // Display templates
+                const templatesContainer = document.getElementById('templates-container');
+                if (data.templates.length === 0) {
+                    templatesContainer.innerHTML = '<p>No prompt templates found.</p>';
+                } else {
+                    templatesContainer.innerHTML = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Template</th></tr></thead><tbody id="templates-tbody"></tbody></table></div>';
+                    const tbody = document.getElementById('templates-tbody');
+                    data.templates.forEach(template => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${template.id}</td>
+                            <td>${template.name || 'N/A'}</td>
+                            <td>${template.description || 'N/A'}</td>
+                            <td><pre>${template.template_text || 'N/A'}</pre></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                // Display usage
+                const usageContainer = document.getElementById('usage-container');
+                if (data.usage.length === 0) {
+                    usageContainer.innerHTML = '<p>No prompt usage found.</p>';
+                } else {
+                    usageContainer.innerHTML = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>ID</th><th>Template ID</th><th>Model</th><th>Success</th><th>Created At</th></tr></thead><tbody id="usage-tbody"></tbody></table></div>';
+                    const tbody = document.getElementById('usage-tbody');
+                    data.usage.forEach(usage => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${usage.id}</td>
+                            <td>${usage.template_id || 'N/A'}</td>
+                            <td>${usage.model || 'N/A'}</td>
+                            <td>${usage.success ? 'Yes' : 'No'}</td>
+                            <td>${usage.created_at || 'N/A'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                // Display logs
+                const logsContainer = document.getElementById('logs-container');
+                if (data.logs.length === 0) {
+                    logsContainer.innerHTML = '<p>No prompt logs found.</p>';
+                } else {
+                    logsContainer.innerHTML = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>ID</th><th>Session ID</th><th>Prompt Type</th><th>Created At</th></tr></thead><tbody id="logs-tbody"></tbody></table></div>';
+                    const tbody = document.getElementById('logs-tbody');
+                    data.logs.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${log.id}</td>
+                            <td>${log.session_id || 'N/A'}</td>
+                            <td>${log.prompt_type || 'N/A'}</td>
+                            <td>${log.created_at || 'N/A'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching prompts:', error);
+                document.getElementById('templates-container').innerHTML = `
+                    <div class="alert alert-danger">Error loading prompt templates: ${error.message}</div>
+                `;
+                document.getElementById('usage-container').innerHTML = `
+                    <div class="alert alert-danger">Error loading prompt usage: ${error.message}</div>
+                `;
+                document.getElementById('logs-container').innerHTML = `
+                    <div class="alert alert-danger">Error loading prompt logs: ${error.message}</div>
+                `;
+            });
+
+        // Fetch reference quality
+        fetch('/api/reference_quality')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('quality-container');
+                if (data.length === 0) {
+                    container.innerHTML = '<p>No reference quality data found.</p>';
+                    return;
+                }
+
+                container.innerHTML = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Reference ID</th><th>Currency</th><th>Relevance</th><th>Authority</th><th>Accuracy</th><th>Purpose</th><th>Notes</th></tr></thead><tbody id="quality-tbody"></tbody></table></div>';
+                const tbody = document.getElementById('quality-tbody');
+                data.forEach(quality => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${quality.reference_id}</td>
+                        <td>${quality.currency_score || 'N/A'}</td>
+                        <td>${quality.relevance_score || 'N/A'}</td>
+                        <td>${quality.authority_score || 'N/A'}</td>
+                        <td>${quality.accuracy_score || 'N/A'}</td>
+                        <td>${quality.purpose_score || 'N/A'}</td>
+                        <td>${quality.assessment_notes || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching reference quality:', error);
+                document.getElementById('quality-container').innerHTML = `
+                    <div class="alert alert-danger">Error loading reference quality data: ${error.message}</div>
+                `;
+            });
+
+        // Fetch categories
+        fetch('/api/reference_categories')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('categories-container');
+                if (data.length === 0) {
+                    container.innerHTML = '<p>No categories found.</p>';
+                    return;
+                }
+
+                container.innerHTML = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead><tbody id="categories-tbody"></tbody></table></div>';
+                const tbody = document.getElementById('categories-tbody');
+                data.forEach(category => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${category.id}</td>
+                        <td>${category.name || 'N/A'}</td>
+                        <td>${category.description || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching categories:', error);
+                document.getElementById('categories-container').innerHTML = `
+                    <div class="alert alert-danger">Error loading categories: ${error.message}</div>
+                `;
+            });
+    </script>
+</body>
+</html>""")
+
+    # Run the app
+    app.run(host='0.0.0.0', port=8080, debug=True)

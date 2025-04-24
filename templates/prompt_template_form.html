@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if template.id %}Edit{% else %}New{% endif %} Prompt Template{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/prompt-templates">Prompt Management</a></li>
+            {% if template.id %}
+                <li class="breadcrumb-item"><a href="/prompt-templates/{{ template.id }}">{{ template.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            {% else %}
+                <li class="breadcrumb-item active" aria-current="page">New Template</li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">{% if template.id %}Edit{% else %}New{% endif %} Prompt Template</h1>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Template Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" id="templateForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ template.name }}" required>
+                    <div class="form-text">A descriptive name for the template</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="2">{{ template.description }}</textarea>
+                    <div class="form-text">A brief description of what this template is used for</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category" required>
+                        {% for category in categories %}
+                            <option value="{{ category.name }}" {% if template.category == category.name %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">The category this template belongs to</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="template_text" class="form-label">Template Text</label>
+                    <textarea class="form-control font-monospace" id="template_text" name="template_text" rows="12" required>{{ template.template_text }}</textarea>
+                    <div class="form-text">
+                        Use <code>{{variable_name}}</code> syntax for variables that will be replaced when the template is used.
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#variableHelpModal">
+                            <i class="bi bi-question-circle"></i> Help with Variables
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="tags" class="form-label">Tags (JSON)</label>
+                    <textarea class="form-control font-monospace" id="tags" name="tags" rows="3">{{ template.tags|tojson }}</textarea>
+                    <div class="form-text">Optional JSON object with tags for this template</div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if template.is_active %}checked{% endif %}>
+                    <label class="form-check-label" for="is_active">Active</label>
+                    <div class="form-text">Inactive templates won't appear in selection lists</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% if template.id %}/prompt-templates/{{ template.id }}{% else %}/prompt-templates{% endif %}" class="btn btn-secondary">Cancel</a>
+                    <div>
+                        <button type="button" class="btn btn-outline-primary me-2" id="previewBtn">Preview</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4" id="variablesCard" style="display: none;">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Detected Variables</h5>
+        </div>
+        <div class="card-body">
+            <div id="variablesList" class="row"></div>
+        </div>
+    </div>
+
+    <div class="card mb-4" id="previewCard" style="display: none;">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Template Preview</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <h6>Template with Variables</h6>
+                <div class="border rounded p-3 bg-light">
+                    <pre class="mb-0"><code id="previewTemplate"></code></pre>
+                </div>
+            </div>
+            <div class="mb-3">
+                <h6>Example Rendered Output</h6>
+                <div class="border rounded p-3 bg-light">
+                    <pre class="mb-0"><code id="previewRendered"></code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Variable Help Modal -->
+<div class="modal fade" id="variableHelpModal" tabindex="-1" aria-labelledby="variableHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="variableHelpModalLabel">Using Variables in Templates</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Variable Syntax</h6>
+                <p>Use double curly braces to define variables: <code>{{variable_name}}</code></p>
+                
+                <h6>Example Template</h6>
+                <pre><code>Generate content about {{topic}} for {{audience}} with a focus on {{focus_area}}.
+
+Include information about:
+1. {{section1}}
+2. {{section2}}
+3. {{section3}}
+
+Make sure the content is appropriate for {{audience_technical_level}} technical level.</code></pre>
+
+                <h6>Variable Naming Best Practices</h6>
+                <ul>
+                    <li>Use descriptive names that indicate the purpose of the variable</li>
+                    <li>Use snake_case (lowercase with underscores) for variable names</li>
+                    <li>Avoid spaces and special characters in variable names</li>
+                    <li>Be consistent with naming conventions across templates</li>
+                </ul>
+
+                <h6>Common Variables</h6>
+                <ul>
+                    <li><code>{{topic}}</code> - The main subject of the content</li>
+                    <li><code>{{audience}}</code> - The target audience (e.g., "small business owners")</li>
+                    <li><code>{{audience_technical_level}}</code> - Technical level (e.g., "beginner", "intermediate", "advanced")</li>
+                    <li><code>{{focus_area}}</code> - Specific aspect to focus on</li>
+                    <li><code>{{mission_pillar1}}</code>, <code>{{mission_pillar2}}</code> - Mission pillars to incorporate</li>
+                    <li><code>{{section1}}</code>, <code>{{section2}}</code> - Content sections</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const templateTextArea = document.getElementById('template_text');
+        const previewBtn = document.getElementById('previewBtn');
+        const variablesCard = document.getElementById('variablesCard');
+        const variablesList = document.getElementById('variablesList');
+        const previewCard = document.getElementById('previewCard');
+        const previewTemplate = document.getElementById('previewTemplate');
+        const previewRendered = document.getElementById('previewRendered');
+
+        // Extract variables from template text
+        function extractVariables(text) {
+            const pattern = /\{\{([^}]+)\}\}/g;
+            const variables = new Set();
+            let match;
+            
+            while ((match = pattern.exec(text)) !== null) {
+                variables.add(match[1]);
+            }
+            
+            return Array.from(variables);
+        }
+
+        // Generate example values for variables
+        function generateExampleValues(variables) {
+            const examples = {};
+            
+            variables.forEach(variable => {
+                // Generate example values based on variable name
+                if (variable.includes('topic')) {
+                    examples[variable] = 'artificial intelligence';
+                } else if (variable.includes('audience')) {
+                    examples[variable] = 'small business owners';
+                } else if (variable.includes('technical_level')) {
+                    examples[variable] = 'intermediate';
+                } else if (variable.includes('focus')) {
+                    examples[variable] = 'practical applications';
+                } else if (variable.includes('mission_pillar')) {
+                    examples[variable] = 'responsible AI usage';
+                } else if (variable.includes('section')) {
+                    examples[variable] = 'Key benefits and challenges';
+                } else {
+                    examples[variable] = `[${variable} example]`;
+                }
+            });
+            
+            return examples;
+        }
+
+        // Render template with example values
+        function renderTemplate(text, values) {
+            let rendered = text;
+            
+            for (const [variable, value] of Object.entries(values)) {
+                const pattern = new RegExp(`\\{\\{${variable}\\}\\}`, 'g');
+                rendered = rendered.replace(pattern, value);
+            }
+            
+            return rendered;
+        }
+
+        // Update variables display
+        function updateVariables() {
+            const text = templateTextArea.value;
+            const variables = extractVariables(text);
+            
+            if (variables.length > 0) {
+                variablesList.innerHTML = '';
+                
+                variables.forEach(variable => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4 mb-2';
+                    
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-info text-dark';
+                    badge.textContent = variable;
+                    
+                    col.appendChild(badge);
+                    variablesList.appendChild(col);
+                });
+                
+                variablesCard.style.display = 'block';
+            } else {
+                variablesCard.style.display = 'none';
+            }
+        }
+
+        // Preview the template
+        function previewTemplate() {
+            const text = templateTextArea.value;
+            const variables = extractVariables(text);
+            const exampleValues = generateExampleValues(variables);
+            
+            previewTemplate.textContent = text;
+            previewRendered.textContent = renderTemplate(text, exampleValues);
+            previewCard.style.display = 'block';
+            
+            // Scroll to preview
+            previewCard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Update variables when template text changes
+        templateTextArea.addEventListener('input', updateVariables);
+        
+        // Preview button click
+        previewBtn.addEventListener('click', previewTemplate);
+        
+        // Form validation
+        document.getElementById('templateForm').addEventListener('submit', function(event) {
+            // Validate JSON in tags field
+            const tagsField = document.getElementById('tags');
+            if (tagsField.value.trim()) {
+                try {
+                    JSON.parse(tagsField.value);
+                } catch (e) {
+                    event.preventDefault();
+                    alert('Tags must be valid JSON. Please check the format.');
+                    tagsField.focus();
+                }
+            }
+        });
+        
+        // Initial update
+        updateVariables();
+    });
+</script>
+{% endblock %}

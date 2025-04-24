@@ -4,30 +4,41 @@ This document outlines the structure of the AI Hub Content Creation System, expl
 
 ## Directory Structure
 
-```
+```bash
 .
-├── README.md                      # Project overview and setup instructions
-├── architecture_diagram.md        # System architecture visualization
-├── ENVIRONMENT_VARIABLES.md       # Environment variable documentation
-├── NEXT_STEPS.md                  # Future development roadmap
-├── PROJECT_STRUCTURE.md           # This file - project structure documentation
-├── .env.example                   # Example environment variables file
-├── requirements.txt               # Python dependencies
+├── app/                           # Web application
+│   ├── dashboard/                 # Dashboard components
+│   ├── routes/                    # Route handlers
+│   ├── main.py                    # Main application entry point
+│   └── web_view.py                # Web view implementation
 │
-├── content_workflow_supabase.py   # Content generation workflow implementation
-├── generate_content_batch.py      # Batch content generation script
-├── google_ai_client.py            # Google Generative AI integration
-├── supabase_client.py             # Supabase database integration
-├── web_view.py                    # Flask web interface
+├── core/                          # Core functionality
+│   ├── google_ai/                 # Google AI integration
+│   ├── supabase/                  # Supabase integration
+│   └── utils/                     # Utility functions
 │
-├── create_tables.sql              # Main database schema for Supabase
-├── sql/                           # Additional SQL scripts
-│   └── create_content_versions_table.sql  # Schema for content versions table
+├── docs/                          # Documentation
+│   ├── api/                       # API documentation
+│   ├── architecture/              # Architecture documentation
+│   ├── content/                   # Content-related documentation
+│   ├── implementation/            # Implementation plans
+│   ├── reference/                 # Reference documentation
+│   ├── samples/                   # Sample content
+│   ├── security/                  # Security documentation
+│   ├── setup/                     # Setup documentation
+│   ├── testing/                   # Testing documentation
+│   ├── ui/                        # UI documentation
+│   └── workflows/                 # Workflow documentation
 │
-├── generated_content/             # Generated content files
-│   └── images/                    # Attached images for content
+├── prompt_management/             # Prompt management functionality
 │
-├── content_versions/              # Content version history
+├── quality/                       # Quality control functionality
+│
+├── reference_management/          # Reference management functionality
+│
+├── scripts/                       # Utility scripts
+│
+├── sql/                           # SQL files
 │
 ├── templates/                     # HTML templates for web interface
 │   ├── base.html                  # Base template with common elements
@@ -38,46 +49,49 @@ This document outlines the structure of the AI Hub Content Creation System, expl
 │   ├── attach_image.html          # Image attachment page
 │   └── search_results.html        # Search results page
 │
-└── test/                          # Test files
-    └── README.md                  # Testing documentation
+├── test/                          # Test files
+│
+├── workflows/                     # Workflow implementations
+│   ├── content/                   # Content generation workflows
+│   └── reference/                 # Reference management workflows
+│
+├── generated_content/             # Generated content files
+│   └── images/                    # Attached images for content
+│
+├── content_versions/              # Content version history
+│
+├── compatibility/                 # Compatibility modules
+│
+├── NEXT_STEPS.md                  # Future development roadmap
+├── PROJECT_STRUCTURE.md           # This file - project structure documentation
+├── README.md                      # Project overview and setup instructions
+├── .env.example                   # Example environment variables file
+├── requirements.txt               # Python dependencies
+└── setup.py                       # Python package setup file
 ```
 
 ## Key Components
 
-### Core Modules
+### Core Functionality
 
-#### content_workflow_supabase.py
+#### core/google_ai/
 
-This module implements the core content generation workflow with Supabase integration. It handles:
-
-- Content generation based on inventory items
-- Dependency management between content items
-- Source collection and integration
-- Logging of prompts and outputs to Supabase
-
-Key functions:
-- `generate_content_for_item()`: Main function to generate content for a specific item
-- `create_prompt()`: Creates a prompt for the Google Generative AI API
-- `create_sources_prompt()`: Creates a prompt for generating sources
-- `add_sources_to_content()`: Integrates sources into the generated content
-
-#### google_ai_client.py
-
-This module provides a unified interface for interacting with Google's Generative AI API. It supports:
+This directory contains modules for interacting with Google's Generative AI API. It supports:
 
 - Multiple Gemini models (1.5-flash, 1.5-pro, 2.0-flash, 2.5-pro-preview-03-25)
 - Text generation with temperature control
 - JSON generation with schema validation
 - Fallback to Node.js implementation if Python package is not available
 
-Key classes and functions:
-- `GoogleAIClient`: Main client class for interacting with the API
+Key functions:
+
 - `generate_content()`: Function to generate text content
 - `generate_json()`: Function to generate JSON content
+- `list_models()`: Function to list available models
 
-#### supabase_client.py
+#### core/supabase/
 
-This module provides functions to interact with Supabase for content inventory, prompt logging, and generation outputs. It handles:
+This directory contains modules for interacting with Supabase for content inventory, prompt logging, and generation outputs. It handles:
 
 - Content inventory management
 - Prompt and output logging
@@ -85,6 +99,7 @@ This module provides functions to interact with Supabase for content inventory, 
 - Status tracking and workflow management
 
 Key functions:
+
 - `is_connected()`: Checks if Supabase client is connected
 - `get_content_inventory()`: Gets content inventory from Supabase
 - `get_content_by_id()`: Gets content details by ID
@@ -93,9 +108,37 @@ Key functions:
 - `log_generation_output()`: Logs a generation output to Supabase
 - `save_content_version()`: Saves a new content version
 
-#### web_view.py
+### Workflow Implementations
 
-This module implements a Flask web interface for viewing and managing content. It provides:
+#### workflows/content/
+
+This directory contains modules for content generation workflows. It handles:
+
+- Content generation based on inventory items
+- Dependency management between content items
+- Source collection and integration
+- Logging of prompts and outputs to Supabase
+
+Key functions:
+
+- `generate_content_for_item()`: Main function to generate content for a specific item
+- `create_prompt()`: Creates a prompt for the Google Generative AI API
+- `create_sources_prompt()`: Creates a prompt for generating sources
+- `add_sources_to_content()`: Integrates sources into the generated content
+
+#### workflows/reference/
+
+This directory contains modules for reference management workflows. It handles:
+
+- Reference extraction from content
+- Reference validation and formatting
+- Reference storage and retrieval
+
+### Web Application
+
+#### app/
+
+This directory contains the web application for viewing and managing content. It provides:
 
 - Dashboard with content statistics
 - Content inventory browser with search and filtering
@@ -104,6 +147,7 @@ This module implements a Flask web interface for viewing and managing content. I
 - Image attachment and management
 
 Key routes:
+
 - `/`: Dashboard
 - `/content`: Content inventory
 - `/content/<content_id>`: Content detail
@@ -111,6 +155,36 @@ Key routes:
 - `/content/<content_id>/workflow`: Workflow management
 - `/content/<content_id>/attach-image`: Image attachment
 - `/search`: Content search
+
+### Prompt Management
+
+#### prompt_management/
+
+This directory contains modules for managing prompts. It handles:
+
+- Prompt template management
+- Prompt versioning
+- Prompt import and export
+
+### Reference Management
+
+#### reference_management/
+
+This directory contains modules for managing references. It handles:
+
+- Reference source management
+- Reference extraction and validation
+- Reference import and export
+
+### Quality Control
+
+#### quality/
+
+This directory contains modules for quality control. It handles:
+
+- Content evaluation
+- Source evaluation
+- A/B testing
 
 ### Database Schema
 

@@ -1,0 +1,48 @@
+{% extends "public_base.html" %}
+
+{% block public_content %}
+<article class="mb-5">
+    <header class="mb-4">
+        <h1 class="display-4">{{ content.title }}</h1>
+        <div class="text-muted mb-3">
+            <span class="me-3"><i class="bi bi-calendar"></i> {{ content.published_date.strftime('%B %d, %Y') }}</span>
+            <span class="me-3"><i class="bi bi-tags"></i> {{ content.category }}</span>
+            <span><i class="bi bi-clock"></i> {{ content.reading_time }} min read</span>
+        </div>
+    </header>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="markdown-content mb-5">
+                {{ content.body|safe }}
+            </div>
+            
+            <div class="share-buttons mb-5">
+                <h5 class="mb-3">Share this article</h5>
+                <div class="btn-group" role="group">
+                    <a href="#" class="btn btn-outline-secondary"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="btn btn-outline-secondary"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="btn btn-outline-secondary"><i class="bi bi-facebook"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Related Articles</h5>
+                    <ul class="list-unstyled">
+                        {% for article in related_content %}
+                        <li class="mb-2">
+                            <a href="/public/article/{{ article.slug }}" class="text-decoration-none">
+                                {{ article.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock %}

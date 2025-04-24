@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}AI Hub Public Portal{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/public">AI Knowledge Hub</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/public/articles">Articles</a></li>
+                <li class="nav-item"><a class="nav-link" href="/public/categories">Categories</a></li>
+                <li class="nav-item"><a class="nav-link" href="/public/about">About</a></li>
+            </ul>
+            <form class="d-flex" action="/public/search">
+                <input class="form-control me-2" type="search" placeholder="Search knowledge base">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% block public_content %}{% endblock %}
+</div>
+
+<footer class="mt-5 py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>About AI Hub</h5>
+                <p>Democratizing AI knowledge for everyone</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Newsletter</h5>
+                <form>
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Enter email">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <h5>Connect</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-decoration-none"><i class="bi bi-twitter"></i> Twitter</a></li>
+                    <li><a href="#" class="text-decoration-none"><i class="bi bi-linkedin"></i> LinkedIn</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}

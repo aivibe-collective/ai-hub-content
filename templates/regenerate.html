@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Regenerate {{ content_item.title }} - AI Hub Content Creation{% endblock %}
+{% block title %}Regenerate {{ content_item|get('title') }} - AI Hub Content Creation{% endblock %}
 
 {% block content %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
-            <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}">{{ content_item.content_id }}</a></li>
+            <li class="breadcrumb-item"><a href="/content/{{ content_item|get('content_id') }}">{{ content_item|get('content_id') }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">Regenerate</li>
         </ol>
     </nav>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="card-title mb-0">Regenerate Content: {{ content_item.title }}</h5>
+            <h5 class="card-title mb-0">Regenerate Content: {{ content_item|get('title') }}</h5>
         </div>
         <div class="card-body">
             <form method="post">
@@ -22,7 +22,7 @@
                     <label for="model" class="form-label">Model</label>
                     <select class="form-select" id="model" name="model" required>
                         {% for model in models %}
-                            <option value="{{ model }}" {% if model == content_item.model %}selected{% endif %}>{{ model }}</option>
+                            <option value="{{ model }}" {% if model == content_item|get('model') %}selected{% endif %}>{{ model }}</option>
                         {% endfor %}
                     </select>
                     <div class="form-text">Select the model to use for content generation.</div>
@@ -36,17 +36,23 @@
                                     <li class="list-group-item p-1"><strong>gemini-2.0-flash</strong>: Improved version with better understanding of context and instructions.</li>
                                     <li class="list-group-item p-1"><strong>gemini-2.5-pro-exp-03-25</strong>: Experimental version of the most advanced model. Best quality but may have usage limits.</li>
                                 </ul>
+                                <div class="alert alert-warning mt-2 mb-0 p-2">
+                                    <small><strong>Note:</strong> Models with "preview" in their name (e.g., gemini-2.5-pro-preview-03-25) don't have a free quota tier. Use "exp" versions instead.</small>
+                                </div>
+                                <div class="text-end mt-2">
+                                    <a href="/models" class="btn btn-sm btn-outline-primary">View all available models</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="temperature" class="form-label">Temperature: <span class="badge bg-primary" id="tempBadge">{{ content_item.temperature|default(0.7) }}</span></label>
-                    <input type="range" class="form-range" id="temperature" name="temperature" min="0.1" max="1.0" step="0.1" value="{{ content_item.temperature|default(0.7) }}" oninput="updateTemperature(this.value)">
-                    <output id="tempOutput" class="d-none">{{ content_item.temperature|default(0.7) }}</output>
+                    <label for="temperature" class="form-label">Temperature: <span class="badge bg-primary" id="tempBadge">{{ content_item|get('temperature')|default(0.7) }}</span></label>
+                    <input type="range" class="form-range" id="temperature" name="temperature" min="0.1" max="1.0" step="0.1" value="{{ content_item|get('temperature')|default(0.7) }}" oninput="updateTemperature(this.value)">
+                    <output id="tempOutput" class="d-none">{{ content_item|get('temperature')|default(0.7) }}</output>
                     <div class="form-text">Higher values make output more random, lower values make it more deterministic.</div>
-                    
+
                     <div class="mt-2">
                         <div class="card">
                             <div class="card-body p-2">
@@ -61,18 +67,24 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="force" name="force">
                     <label class="form-check-label" for="force">Force regeneration (ignore dependencies)</label>
                 </div>
-                
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="include_references" name="include_references" {% if include_references_default %}checked{% endif %}>
+                    <label class="form-check-label" for="include_references">Automatically extract and manage references</label>
+                    <div class="form-text">When checked, references will be automatically extracted from the generated content and stored in the reference database.</div>
+                </div>
+
                 <div class="alert alert-warning">
                     <strong>Warning:</strong> This will regenerate the content and replace the current version. The current version will be saved in the version history.
                 </div>
-                
+
                 <div class="d-flex justify-content-between">
-                    <a href="/content/{{ content_item.content_id }}" class="btn btn-secondary">Cancel</a>
+                    <a href="/content/{{ content_item|get('content_id') }}" class="btn btn-secondary">Cancel</a>
                     <button type="submit" class="btn btn-primary">Regenerate Content</button>
                 </div>
             </form>
@@ -85,11 +97,11 @@
     function updateTemperature(value) {
         // Update the hidden output
         document.getElementById('tempOutput').value = value;
-        
+
         // Update the badge
         const badge = document.getElementById('tempBadge');
         badge.textContent = value;
-        
+
         // Change badge color based on temperature
         const badgeEl = document.getElementById('tempBadge');
         if (value <= 0.3) {

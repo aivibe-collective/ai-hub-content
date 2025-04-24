@@ -1,28 +1,29 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ content_item.title }} - AI Hub Content Creation{% endblock %}
+{% block title %}{{ content_item|get('title') }} - AI Hub Content Creation{% endblock %}
 
 {% block content %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ content_item.content_id }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ content_item|get('content_id') }}</li>
         </ol>
     </nav>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ content_item.title }}</h1>
+        <h1>{{ content_item|get('title') }}</h1>
         <div>
-            <span class="badge {% if content_item.status == 'Completed' %}bg-success{% elif content_item.status == 'In Progress' %}bg-warning{% elif content_item.status == 'Regenerating' %}bg-info{% elif content_item.status == 'Edited' %}bg-info{% elif content_item.status == 'Review Requested' %}bg-primary{% elif content_item.status == 'In Review' %}bg-primary{% elif content_item.status == 'Revision Needed' %}bg-warning{% elif content_item.status == 'Approved' %}bg-success{% elif content_item.status == 'Published' %}bg-success{% elif content_item.status == 'Archived' %}bg-secondary{% elif content_item.status == 'Failed' %}bg-danger{% else %}bg-secondary{% endif %} fs-5 me-2">{{ content_item.status }}</span>
+            <span class="badge {% if content_item|get('status') == 'Completed' %}bg-success{% elif content_item|get('status') == 'In Progress' %}bg-warning{% elif content_item|get('status') == 'Regenerating' %}bg-info{% elif content_item|get('status') == 'Edited' %}bg-info{% elif content_item|get('status') == 'Review Requested' %}bg-primary{% elif content_item|get('status') == 'In Review' %}bg-primary{% elif content_item|get('status') == 'Revision Needed' %}bg-warning{% elif content_item|get('status') == 'Approved' %}bg-success{% elif content_item|get('status') == 'Published' %}bg-success{% elif content_item|get('status') == 'Archived' %}bg-secondary{% elif content_item|get('status') == 'Failed' %}bg-danger{% else %}bg-secondary{% endif %} fs-5 me-2">{{ content_item|get('status') }}</span>
             <div class="btn-group me-2" role="group">
-                <a href="/content/{{ content_item.content_id }}/edit" class="btn btn-outline-primary">Edit Content</a>
-                <a href="/content/{{ content_item.content_id }}/workflow" class="btn btn-outline-info">Workflow</a>
-                <a href="/content/{{ content_item.content_id }}/attach-image" class="btn btn-outline-secondary">Attach Image</a>
+                <a href="/content/{{ content_item|get('content_id') }}/edit" class="btn btn-outline-primary">Edit Content</a>
+                <a href="/content/{{ content_item|get('content_id') }}/workflow" class="btn btn-outline-info">Workflow</a>
+                <a href="/content/{{ content_item|get('content_id') }}/attach-image" class="btn btn-outline-secondary">Attach Image</a>
+                <a href="/content/{{ content_item|get('content_id') }}/references" class="btn btn-outline-warning">References</a>
             </div>
             <div class="btn-group" role="group">
-                <a href="/content/{{ content_item.content_id }}/versions" class="btn btn-outline-dark me-2">Version History</a>
-                <a href="/content/{{ content_item.content_id }}/regenerate" class="btn btn-primary">Regenerate</a>
+                <a href="/content/{{ content_item|get('content_id') }}/versions" class="btn btn-outline-dark me-2">Version History</a>
+                <a href="/content/{{ content_item|get('content_id') }}/regenerate" class="btn btn-primary">Regenerate</a>
             </div>
         </div>
     </div>
@@ -37,35 +38,35 @@
                     <table class="table">
                         <tr>
                             <th>Content ID</th>
-                            <td>{{ content_item.content_id }}</td>
+                            <td>{{ content_item|get('content_id') }}</td>
                         </tr>
                         <tr>
                             <th>Section</th>
-                            <td>{{ content_item.section }}</td>
+                            <td>{{ content_item|get('section') }}</td>
                         </tr>
                         <tr>
                             <th>Subsection</th>
-                            <td>{{ content_item.subsection }}</td>
+                            <td>{{ content_item|get('subsection') }}</td>
                         </tr>
                         <tr>
                             <th>Content Type</th>
-                            <td>{{ content_item.content_type }}</td>
+                            <td>{{ content_item|get('content_type') }}</td>
                         </tr>
                         <tr>
                             <th>Priority</th>
-                            <td>{{ content_item.priority }}</td>
+                            <td>{{ content_item|get('priority') }}</td>
                         </tr>
                         <tr>
                             <th>Dependencies</th>
-                            <td>{{ content_item.dependencies }}</td>
+                            <td>{{ content_item|get('dependencies') }}</td>
                         </tr>
                         <tr>
                             <th>Audience Level</th>
-                            <td>{{ content_item.audience_technical_level }}</td>
+                            <td>{{ content_item|get('audience_technical_level') }}</td>
                         </tr>
                         <tr>
                             <th>Audience Role</th>
-                            <td>{{ content_item.audience_role }}</td>
+                            <td>{{ content_item|get('audience_role') }}</td>
                         </tr>
                     </table>
                 </div>
@@ -80,15 +81,15 @@
                     <table class="table">
                         <tr>
                             <th>Primary Mission Pillar 1</th>
-                            <td>{{ content_item.primary_mission_pillar_1 }}</td>
+                            <td>{{ content_item|get('primary_mission_pillar_1') }}</td>
                         </tr>
                         <tr>
                             <th>Primary Mission Pillar 2</th>
-                            <td>{{ content_item.primary_mission_pillar_2 }}</td>
+                            <td>{{ content_item|get('primary_mission_pillar_2') }}</td>
                         </tr>
                         <tr>
                             <th>Secondary Mission Pillars</th>
-                            <td>{{ content_item.secondary_mission_pillars }}</td>
+                            <td>{{ content_item|get('secondary_mission_pillars') }}</td>
                         </tr>
                     </table>
                 </div>
@@ -99,9 +100,9 @@
                 </div>
                 <div class="card-body">
                     <h6>SMART Objectives</h6>
-                    <p>{{ content_item.smart_objectives }}</p>
+                    <p>{{ content_item|get('smart_objectives') }}</p>
                     <h6>Practical Components</h6>
-                    <p>{{ content_item.practical_components }}</p>
+                    <p>{{ content_item|get('practical_components') }}</p>
                 </div>
             </div>
         </div>

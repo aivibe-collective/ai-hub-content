@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ reference.title }} - Reference{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/references">Reference Management</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ reference.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">{{ reference.title }}</h1>
+        <div class="btn-group">
+            <a href="/references/{{ reference.reference_id }}/edit" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#citationModal">
+                <i class="bi bi-quote"></i> Citation
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Reference Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Authors</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {{ reference.authors or 'N/A' }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Publication</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {{ reference.publication_name or 'N/A' }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Date</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {% if reference.publication_date %}
+                                {{ reference.publication_date|truncate(10, true, "") }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Type</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {{ reference.reference_type }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>URL</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {% if reference.url %}
+                                <a href="{{ reference.url }}" target="_blank">{{ reference.url }}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>DOI</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {% if reference.doi %}
+                                <a href="https://doi.org/{{ reference.doi }}" target="_blank">{{ reference.doi }}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Categories</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {% if reference.categories %}
+                                {% for category_id in reference.categories %}
+                                    {% for category in categories %}
+                                        {% if category.id == category_id %}
+                                            <span class="badge bg-info text-dark">{{ category.name }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% else %}
+                                <em>None</em>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Keywords</strong>
+                        </div>
+                        <div class="col-md-9">
+                            {% if reference.keywords %}
+                                {% for keyword in reference.keywords %}
+                                    <span class="badge bg-secondary">{{ keyword }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <em>None</em>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Status</strong>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="referenceStatus" {% if reference.is_active %}checked{% endif %} onchange="updateStatus(this.checked)">
+                                <label class="form-check-label" for="referenceStatus">
+                                    {% if reference.is_active %}Active{% else %}Inactive{% endif %}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if reference.abstract %}
+                        <div class="mb-3">
+                            <h6>Abstract</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ reference.abstract }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if reference.content %}
+                        <div class="mb-3">
+                            <h6>Content</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ reference.content }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quality Assessment</h5>
+                </div>
+                <div class="card-body">
+                    {% if reference.quality_assessment %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>Currency:</div>
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if reference.quality_assessment.currency_score and i < reference.quality_assessment.currency_score %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>Relevance:</div>
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if reference.quality_assessment.relevance_score and i < reference.quality_assessment.relevance_score %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>Authority:</div>
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if reference.quality_assessment.authority_score and i < reference.quality_assessment.authority_score %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>Accuracy:</div>
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if reference.quality_assessment.accuracy_score and i < reference.quality_assessment.accuracy_score %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>Purpose:</div>
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if reference.quality_assessment.purpose_score and i < reference.quality_assessment.purpose_score %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>Overall:</div>
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if reference.quality_assessment.overall_score and i < reference.quality_assessment.overall_score %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            {% if reference.quality_assessment.assessment_notes %}
+                                <div class="mb-3">
+                                    <h6>Assessment Notes</h6>
+                                    <div class="border rounded p-3 bg-light">
+                                        {{ reference.quality_assessment.assessment_notes }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="text-muted small">
+                                Assessed by {{ reference.quality_assessment.assessed_by }} on 
+                                {{ reference.quality_assessment.assessed_at|truncate(10, true, "") }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No quality assessment available. <a href="/references/{{ reference.reference_id }}/edit">Add assessment</a>.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Linked Content</h5>
+                </div>
+                <div class="card-body">
+                    {% if linked_content %}
+                        <div class="list-group list-group-flush">
+                            {% for content in linked_content %}
+                                <a href="/content/{{ content.content_id }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ content.title }}</h6>
+                                        <small>{{ content.section }}</small>
+                                    </div>
+                                    {% if content.citation_context %}
+                                        <p class="mb-1 small">{{ content.citation_context }}</p>
+                                    {% endif %}
+                                    {% if content.relevance_score %}
+                                        <div class="text-warning small">
+                                            {% for i in range(5) %}
+                                                {% if i < content.relevance_score %}
+                                                    <i class="bi bi-star-fill"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            This reference is not linked to any content items yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Citation Modal -->
+    <div class="modal fade" id="citationModal" tabindex="-1" aria-labelledby="citationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="citationModalLabel">Citation Formats</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>APA Format</h6>
+                    <div class="border rounded p-3 bg-light mb-3">
+                        <div id="apaCitation">
+                            {% if reference.authors %}
+                                {{ reference.authors }}.
+                            {% endif %}
+                            {% if reference.publication_date %}
+                                ({{ reference.publication_date|truncate(4, true, "") }}).
+                            {% endif %}
+                            <em>{{ reference.title }}</em>.
+                            {% if reference.publication_name %}
+                                {{ reference.publication_name }}.
+                            {% endif %}
+                            {% if reference.doi %}
+                                https://doi.org/{{ reference.doi }}
+                            {% elif reference.url %}
+                                {{ reference.url }}
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyToClipboard('apaCitation')">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+
+                    <h6>MLA Format</h6>
+                    <div class="border rounded p-3 bg-light mb-3">
+                        <div id="mlaCitation">
+                            {% if reference.authors %}
+                                {{ reference.authors }}.
+                            {% endif %}
+                            "<em>{{ reference.title }}</em>."
+                            {% if reference.publication_name %}
+                                {{ reference.publication_name }},
+                            {% endif %}
+                            {% if reference.publication_date %}
+                                {{ reference.publication_date|truncate(10, true, "") }},
+                            {% endif %}
+                            {% if reference.doi %}
+                                https://doi.org/{{ reference.doi }}
+                            {% elif reference.url %}
+                                {{ reference.url }}
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyToClipboard('mlaCitation')">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+
+                    <h6>Chicago Format</h6>
+                    <div class="border rounded p-3 bg-light">
+                        <div id="chicagoCitation">
+                            {% if reference.authors %}
+                                {{ reference.authors }}.
+                            {% endif %}
+                            "<em>{{ reference.title }}</em>."
+                            {% if reference.publication_name %}
+                                {{ reference.publication_name }}
+                            {% endif %}
+                            {% if reference.publication_date %}
+                                ({{ reference.publication_date|truncate(4, true, "") }}).
+                            {% endif %}
+                            {% if reference.doi %}
+                                https://doi.org/{{ reference.doi }}
+                            {% elif reference.url %}
+                                {{ reference.url }}
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyToClipboard('chicagoCitation')">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateStatus(isActive) {
+        fetch('/api/references/{{ reference.reference_id }}/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                is_active: isActive
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelector('label[for="referenceStatus"]').textContent = isActive ? 'Active' : 'Inactive';
+            } else {
+                alert('Failed to update status: ' + data.error);
+                // Reset the checkbox
+                document.getElementById('referenceStatus').checked = !isActive;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the status');
+            // Reset the checkbox
+            document.getElementById('referenceStatus').checked = !isActive;
+        });
+    }
+
+    function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        const text = element.innerText;
+        
+        navigator.clipboard.writeText(text).then(() => {
+            // Show a temporary success message
+            const button = element.nextElementSibling;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-outline-secondary');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-secondary');
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy to clipboard');
+        });
+    }
+</script>
+{% endblock %}

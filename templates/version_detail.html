@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}Version {{ version.version_number }}: {{ content_item.title }} - AI Hub Content Creation{% endblock %}
+{% block title %}Version {{ version|get('version_number') }}: {{ content_item|get('title') }} - AI Hub Content Creation{% endblock %}
 
 {% block content %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="/content">Content Inventory</a></li>
-            <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}">{{ content_item.content_id }}</a></li>
-            <li class="breadcrumb-item"><a href="/content/{{ content_item.content_id }}/versions">Version History</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Version {{ version.version_number }}</li>
+            <li class="breadcrumb-item"><a href="/content/{{ content_item|get('content_id') }}">{{ content_item|get('content_id') }}</a></li>
+            <li class="breadcrumb-item"><a href="/content/{{ content_item|get('content_id') }}/versions">Version History</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Version {{ version|get('version_number') }}</li>
         </ol>
     </nav>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Version {{ version.version_number }}: {{ content_item.title }}</h1>
-        <a href="/content/{{ content_item.content_id }}/versions" class="btn btn-primary">Back to Versions</a>
+        <h1>Version {{ version|get('version_number') }}: {{ content_item|get('title') }}</h1>
+        <a href="/content/{{ content_item|get('content_id') }}/versions" class="btn btn-primary">Back to Versions</a>
     </div>
 
     <div class="row">
@@ -28,19 +28,19 @@
                     <table class="table">
                         <tr>
                             <th>Version Number</th>
-                            <td>{{ version.version_number }}</td>
+                            <td>{{ version|get('version_number') }}</td>
                         </tr>
                         <tr>
                             <th>Model</th>
-                            <td>{{ version.model }}</td>
+                            <td>{{ version|get('model') }}</td>
                         </tr>
                         <tr>
                             <th>Temperature</th>
-                            <td>{{ version.temperature }}</td>
+                            <td>{{ version|get('temperature') }}</td>
                         </tr>
                         <tr>
                             <th>Created At</th>
-                            <td>{{ version.created_at }}</td>
+                            <td>{{ version|get('created_at') }}</td>
                         </tr>
                     </table>
                 </div>
@@ -53,22 +53,22 @@
             <h5 class="card-title mb-0">Content</h5>
         </div>
         <div class="card-body">
-            <div class="markdown-content" data-markdown="{{ version.content_text }}"></div>
+            <div class="markdown-content" data-markdown="{{ version|get('content_text') }}"></div>
         </div>
     </div>
 
     <div class="d-flex justify-content-between">
-        <a href="/content/{{ content_item.content_id }}/versions" class="btn btn-secondary">Back to Versions</a>
+        <a href="/content/{{ content_item|get('content_id') }}/versions" class="btn btn-secondary">Back to Versions</a>
 
         <div>
-            {% if version.version_number > 1 %}
-                <a href="/content/{{ content_item.content_id }}/versions/{{ version.version_number - 1 }}" class="btn btn-outline-primary">Previous Version</a>
+            {% if version|get('version_number') > 1 %}
+                <a href="/content/{{ content_item|get('content_id') }}/versions/{{ version|get('version_number') - 1 }}" class="btn btn-outline-primary">Previous Version</a>
             {% endif %}
 
-            <a href="/content/{{ content_item.content_id }}" class="btn btn-outline-primary">Current Version</a>
+            <a href="/content/{{ content_item|get('content_id') }}" class="btn btn-outline-primary">Current Version</a>
 
-            {% if versions and version.version_number < versions[0].version_number %}
-                <a href="/content/{{ content_item.content_id }}/versions/{{ version.version_number + 1 }}" class="btn btn-outline-primary">Next Version</a>
+            {% if versions and version|get('version_number') < versions[0]|get('version_number') %}
+                <a href="/content/{{ content_item|get('content_id') }}/versions/{{ version|get('version_number') + 1 }}" class="btn btn-outline-primary">Next Version</a>
             {% endif %}
         </div>
     </div>

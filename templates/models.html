@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Available Models - AI Hub Content Creation{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Available Models</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Available Google AI Models</h5>
+        </div>
+        <div class="card-body">
+            <p class="card-text">
+                These models are available for content generation through the Google Generative AI API.
+                Different models have different capabilities and performance characteristics.
+            </p>
+            
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Description</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for model in models %}
+                            <tr>
+                                <td><code>{{ model }}</code></td>
+                                <td>
+                                    {% if 'gemini-1.5-flash' in model %}
+                                        Fast and efficient model for general content generation
+                                    {% elif 'gemini-1.5-pro' in model %}
+                                        More powerful model with better reasoning capabilities
+                                    {% elif 'gemini-2.0-flash' in model %}
+                                        Improved version with better understanding of context
+                                    {% elif 'gemini-2.5-pro-exp' in model %}
+                                        Experimental version of the most advanced model
+                                    {% elif 'gemini-2.5-pro-preview' in model %}
+                                        Preview version of the most advanced model (no free tier)
+                                    {% else %}
+                                        Google Generative AI model
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if 'flash' in model %}
+                                        Quick content generation, simple tasks
+                                    {% elif 'pro' in model %}
+                                        Complex content, reasoning tasks
+                                    {% else %}
+                                        General content generation
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <h6 class="alert-heading">Model Selection Guide</h6>
+                <ul class="mb-0">
+                    <li><strong>Flash models</strong> (e.g., gemini-1.5-flash): Faster and more efficient, good for simple content generation tasks.</li>
+                    <li><strong>Pro models</strong> (e.g., gemini-1.5-pro): More powerful, better for complex reasoning and detailed content.</li>
+                    <li><strong>Experimental models</strong> (e.g., gemini-2.5-pro-exp-03-25): Latest capabilities but may have limitations or be less stable.</li>
+                </ul>
+            </div>
+            
+            <div class="alert alert-warning mt-3">
+                <h6 class="alert-heading">Note on Preview Models</h6>
+                <p class="mb-0">Models with "preview" in their name (e.g., gemini-2.5-pro-preview-03-25) don't have a free quota tier. 
+                Use experimental versions (e.g., gemini-2.5-pro-exp-03-25) for free tier access.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

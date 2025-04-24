@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block title %}Test Prompt Template - {{ template.name }}{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/prompt-templates">Prompt Management</a></li>
+            <li class="breadcrumb-item"><a href="/prompt-templates/{{ template.id }}">{{ template.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Test</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Test Prompt Template: {{ template.name }}</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Template Variables</h5>
+                </div>
+                <div class="card-body">
+                    <form id="variableForm">
+                        {% for variable in template.variables %}
+                            <div class="mb-3">
+                                <label for="var_{{ variable.name }}" class="form-label">
+                                    {{ variable.name }}
+                                    {% if variable.required %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                <input type="text" class="form-control" id="var_{{ variable.name }}" name="{{ variable.name }}" 
+                                       value="{{ variable.default_value }}" {% if variable.required %}required{% endif %}>
+                                {% if variable.description %}
+                                    <div class="form-text">{{ variable.description }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="mb-3">
+                            <label for="model" class="form-label">Model</label>
+                            <select class="form-select" id="model" name="model">
+                                {% for model in models %}
+                                    <option value="{{ model }}">{{ model }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="temperature" class="form-label">Temperature: <span id="tempValue">0.7</span></label>
+                            <input type="range" class="form-range" id="temperature" name="temperature" min="0.1" max="1.0" step="0.1" value="0.7" oninput="updateTemperature(this.value)">
+                            <div class="form-text">Higher values make output more random, lower values make it more deterministic.</div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-primary" id="renderBtn">Render Template</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Rendered Prompt</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="border rounded p-3 bg-light">
+                            <pre class="mb-0"><code id="renderedPrompt">Fill in the variables and click "Render Template" to see the rendered prompt.</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-success" id="generateBtn" disabled>Generate with AI</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4" id="resultCard" style="display: none;">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Generation Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="generationSpinner" class="text-center p-4" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Generating content...</p>
+                    </div>
+                    <div id="generationResult" class="border rounded p-3 bg-light">
+                        <div class="markdown-content" id="resultContent"></div>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Feedback</h6>
+                        <div class="mb-2">
+                            <div class="rating">
+                                <span class="rating-star" data-rating="1"><i class="bi bi-star"></i></span>
+                                <span class="rating-star" data-rating="2"><i class="bi bi-star"></i></span>
+                                <span class="rating-star" data-rating="3"><i class="bi bi-star"></i></span>
+                                <span class="rating-star" data-rating="4"><i class="bi bi-star"></i></span>
+                                <span class="rating-star" data-rating="5"><i class="bi bi-star"></i></span>
+                                <span class="ms-2" id="ratingText">Not rated</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="feedbackText" rows="2" placeholder="Optional feedback comments"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="submitFeedbackBtn">Submit Feedback</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const variableForm = document.getElementById('variableForm');
+        const renderBtn = document.getElementById('renderBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const renderedPrompt = document.getElementById('renderedPrompt');
+        const resultCard = document.getElementById('resultCard');
+        const generationSpinner = document.getElementById('generationSpinner');
+        const generationResult = document.getElementById('generationResult');
+        const resultContent = document.getElementById('resultContent');
+        const ratingStars = document.querySelectorAll('.rating-star');
+        const ratingText = document.getElementById('ratingText');
+        const feedbackText = document.getElementById('feedbackText');
+        const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+        
+        let currentRating = 0;
+        let usageId = null;
+        
+        // Update temperature display
+        window.updateTemperature = function(value) {
+            document.getElementById('tempValue').textContent = value;
+        };
+        
+        // Render the template with the provided variables
+        renderBtn.addEventListener('click', function() {
+            const formData = new FormData(variableForm);
+            const variables = {};
+            
+            // Extract variables from form
+            for (const [key, value] of formData.entries()) {
+                if (key !== 'model' && key !== 'temperature') {
+                    variables[key] = value;
+                }
+            }
+            
+            // Send request to render the template
+            fetch('/api/prompt-templates/{{ template.id }}/render', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    variables: variables
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderedPrompt.textContent = data.rendered_prompt;
+                    generateBtn.disabled = false;
+                } else {
+                    renderedPrompt.textContent = 'Error: ' + data.error;
+                    generateBtn.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                renderedPrompt.textContent = 'An error occurred while rendering the template';
+                generateBtn.disabled = true;
+            });
+        });
+        
+        // Generate content with the rendered prompt
+        generateBtn.addEventListener('click', function() {
+            const formData = new FormData(variableForm);
+            const variables = {};
+            
+            // Extract variables from form
+            for (const [key, value] of formData.entries()) {
+                if (key !== 'model' && key !== 'temperature') {
+                    variables[key] = value;
+                }
+            }
+            
+            const model = formData.get('model');
+            const temperature = formData.get('temperature');
+            
+            // Show spinner
+            generationSpinner.style.display = 'block';
+            generationResult.style.display = 'none';
+            resultCard.style.display = 'block';
+            
+            // Reset feedback
+            resetRating();
+            feedbackText.value = '';
+            
+            // Send request to generate content
+            fetch('/api/prompt-templates/{{ template.id }}/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    variables: variables,
+                    model: model,
+                    temperature: parseFloat(temperature)
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide spinner
+                generationSpinner.style.display = 'none';
+                generationResult.style.display = 'block';
+                
+                if (data.success) {
+                    resultContent.innerHTML = marked.parse(data.content);
+                    usageId = data.usage_id;
+                } else {
+                    resultContent.textContent = 'Error: ' + data.error;
+                    usageId = null;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                generationSpinner.style.display = 'none';
+                generationResult.style.display = 'block';
+                resultContent.textContent = 'An error occurred while generating content';
+                usageId = null;
+            });
+        });
+        
+        // Handle star rating
+        ratingStars.forEach(star => {
+            // Hover effect
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.dataset.rating);
+                updateStars(rating, true);
+            });
+            
+            // Click to set rating
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.rating);
+                currentRating = rating;
+                updateStars(rating);
+                ratingText.textContent = `${rating} star${rating !== 1 ? 's' : ''}`;
+            });
+        });
+        
+        // Reset hover effect when mouse leaves rating container
+        document.querySelector('.rating').addEventListener('mouseleave', function() {
+            updateStars(currentRating);
+        });
+        
+        // Update star display
+        function updateStars(rating, isHover = false) {
+            ratingStars.forEach(star => {
+                const starRating = parseInt(star.dataset.rating);
+                if (starRating <= rating) {
+                    star.innerHTML = '<i class="bi bi-star-fill"></i>';
+                } else {
+                    star.innerHTML = '<i class="bi bi-star"></i>';
+                }
+            });
+            
+            if (!isHover && rating === 0) {
+                ratingText.textContent = 'Not rated';
+            }
+        }
+        
+        // Reset rating
+        function resetRating() {
+            currentRating = 0;
+            updateStars(0);
+            ratingText.textContent = 'Not rated';
+        }
+        
+        // Submit feedback
+        submitFeedbackBtn.addEventListener('click', function() {
+            if (!usageId) {
+                alert('No generation to provide feedback for');
+                return;
+            }
+            
+            if (currentRating === 0) {
+                alert('Please provide a rating');
+                return;
+            }
+            
+            fetch('/api/prompt-usage/' + usageId + '/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: currentRating,
+                    feedback_text: feedbackText.value,
+                    feedback_type: 'user'
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Feedback submitted successfully');
+                    // Disable feedback submission
+                    submitFeedbackBtn.disabled = true;
+                } else {
+                    alert('Failed to submit feedback: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting feedback');
+            });
+        });
+    });
+</script>
+{% endblock %}

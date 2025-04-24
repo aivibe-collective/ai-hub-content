@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if reference and reference.reference_id %}Edit{% else %}New{% endif %} Reference{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/references">Reference Management</a></li>
+            {% if reference and reference.reference_id %}
+                <li class="breadcrumb-item"><a href="/references/{{ reference.reference_id }}">{{ reference.title }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            {% else %}
+                <li class="breadcrumb-item active" aria-current="page">New Reference</li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">{% if reference and reference.reference_id %}Edit{% else %}New{% endif %} Reference</h1>
+    </div>
+
+    <form method="post" id="referenceForm">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Reference Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="reference_type" class="form-label">Reference Type</label>
+                            <select class="form-select" id="reference_type" name="reference_type" required onchange="updateRequiredFields()">
+                                {% for type in types %}
+                                    <option value="{{ type.name }}" data-required="{{ type.required_fields|tojson }}" {% if reference and reference.reference_type == type.name %}selected{% endif %}>{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Different reference types have different required fields</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ reference.title if reference else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="authors" class="form-label">Authors</label>
+                            <input type="text" class="form-control" id="authors" name="authors" value="{{ reference.authors if reference else '' }}">
+                            <div class="form-text">Format: Last, First; Last, First</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="publication_name" class="form-label">Publication Name</label>
+                                <input type="text" class="form-control" id="publication_name" name="publication_name" value="{{ reference.publication_name if reference else '' }}">
+                                <div class="form-text">Journal, book, website, etc.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="publication_date" class="form-label">Publication Date</label>
+                                <input type="date" class="form-control" id="publication_date" name="publication_date" value="{{ reference.publication_date|truncate(10, true, '') if reference and reference.publication_date else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="url" class="form-label">URL</label>
+                                <input type="url" class="form-control" id="url" name="url" value="{{ reference.url if reference else '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="doi" class="form-label">DOI</label>
+                                <input type="text" class="form-control" id="doi" name="doi" value="{{ reference.doi if reference else '' }}">
+                                <div class="form-text">Digital Object Identifier (e.g., 10.1000/xyz123)</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="abstract" class="form-label">Abstract</label>
+                            <textarea class="form-control" id="abstract" name="abstract" rows="3">{{ reference.abstract if reference else '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="5">{{ reference.content if reference else '' }}</textarea>
+                            <div class="form-text">Full text or notes about the reference</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="keywords" class="form-label">Keywords</label>
+                            <input type="text" class="form-control" id="keywords" name="keywords" value="{{ reference.keywords|join(', ') if reference and reference.keywords else '' }}">
+                            <div class="form-text">Comma-separated list of keywords</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Categories</label>
+                            <div class="row">
+                                {% for category in categories %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="categories" value="{{ category.id }}" id="category{{ loop.index }}" {% if reference and reference.categories and category.id in reference.categories %}checked{% endif %}>
+                                            <label class="form-check-label" for="category{{ loop.index }}">
+                                                {{ category.name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if not reference or reference.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">Active</label>
+                            <div class="form-text">Inactive references won't appear in selection lists</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quality Assessment (CRAAP Test)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="currency_score" class="form-label">Currency</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range me-2" id="currency_score" name="currency_score" min="1" max="5" step="1" value="{{ reference.quality_assessment.currency_score if reference and reference.quality_assessment and reference.quality_assessment.currency_score else '3' }}" oninput="updateRatingDisplay('currency')">
+                                <div class="text-warning" id="currency_rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star"></i>
+                                </div>
+                            </div>
+                            <div class="form-text">How recent is the information?</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="relevance_score" class="form-label">Relevance</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range me-2" id="relevance_score" name="relevance_score" min="1" max="5" step="1" value="{{ reference.quality_assessment.relevance_score if reference and reference.quality_assessment and reference.quality_assessment.relevance_score else '3' }}" oninput="updateRatingDisplay('relevance')">
+                                <div class="text-warning" id="relevance_rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star"></i>
+                                </div>
+                            </div>
+                            <div class="form-text">How important is the information for your needs?</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="authority_score" class="form-label">Authority</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range me-2" id="authority_score" name="authority_score" min="1" max="5" step="1" value="{{ reference.quality_assessment.authority_score if reference and reference.quality_assessment and reference.quality_assessment.authority_score else '3' }}" oninput="updateRatingDisplay('authority')">
+                                <div class="text-warning" id="authority_rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star"></i>
+                                </div>
+                            </div>
+                            <div class="form-text">Who is the creator/author/publisher?</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="accuracy_score" class="form-label">Accuracy</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range me-2" id="accuracy_score" name="accuracy_score" min="1" max="5" step="1" value="{{ reference.quality_assessment.accuracy_score if reference and reference.quality_assessment and reference.quality_assessment.accuracy_score else '3' }}" oninput="updateRatingDisplay('accuracy')">
+                                <div class="text-warning" id="accuracy_rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star"></i>
+                                </div>
+                            </div>
+                            <div class="form-text">How reliable, truthful, and correct is the content?</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="purpose_score" class="form-label">Purpose</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range me-2" id="purpose_score" name="purpose_score" min="1" max="5" step="1" value="{{ reference.quality_assessment.purpose_score if reference and reference.quality_assessment and reference.quality_assessment.purpose_score else '3' }}" oninput="updateRatingDisplay('purpose')">
+                                <div class="text-warning" id="purpose_rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star"></i>
+                                </div>
+                            </div>
+                            <div class="form-text">Why does the information exist?</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="assessment_notes" class="form-label">Assessment Notes</label>
+                            <textarea class="form-control" id="assessment_notes" name="assessment_notes" rows="3">{{ reference.quality_assessment.assessment_notes if reference and reference.quality_assessment else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Required Fields</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush" id="requiredFieldsList">
+                            <li class="list-group-item">Title</li>
+                            <li class="list-group-item">Authors</li>
+                            <li class="list-group-item">Publication Date</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="{% if reference and reference.reference_id %}/references/{{ reference.reference_id }}{% else %}/references{% endif %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Reference</button>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize required fields
+        updateRequiredFields();
+        
+        // Initialize rating displays
+        updateRatingDisplay('currency');
+        updateRatingDisplay('relevance');
+        updateRatingDisplay('authority');
+        updateRatingDisplay('accuracy');
+        updateRatingDisplay('purpose');
+    });
+    
+    function updateRequiredFields() {
+        const typeSelect = document.getElementById('reference_type');
+        const selectedOption = typeSelect.options[typeSelect.selectedIndex];
+        const requiredFields = JSON.parse(selectedOption.dataset.required);
+        
+        const requiredFieldsList = document.getElementById('requiredFieldsList');
+        requiredFieldsList.innerHTML = '';
+        
+        requiredFields.forEach(field => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            
+            // Convert field name to display name
+            let displayName = field.charAt(0).toUpperCase() + field.slice(1);
+            displayName = displayName.replace('_', ' ');
+            
+            li.textContent = displayName;
+            requiredFieldsList.appendChild(li);
+            
+            // Make the field required in the form
+            const fieldElement = document.getElementById(field);
+            if (fieldElement) {
+                fieldElement.required = true;
+                
+                // Add visual indicator
+                const label = document.querySelector(`label[for="${field}"]`);
+                if (label) {
+                    if (!label.innerHTML.includes('*')) {
+                        label.innerHTML += ' <span class="text-danger">*</span>';
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateRatingDisplay(field) {
+        const slider = document.getElementById(`${field}_score`);
+        const rating = document.getElementById(`${field}_rating`);
+        const value = parseInt(slider.value);
+        
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= value) {
+                stars += '<i class="bi bi-star-fill"></i>';
+            } else {
+                stars += '<i class="bi bi-star"></i>';
+            }
+        }
+        
+        rating.innerHTML = stars;
+    }
+</script>
+{% endblock %}

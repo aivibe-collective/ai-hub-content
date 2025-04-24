@@ -1,93 +1,145 @@
 # Community Code of Conduct (MOD-COC-001)
 
-**Target Audience:** All
+## 1. Introduction: Our Community Commitment
 
-**Technical Level:** All
+Welcome! This document outlines our Community Code of Conduct (CoC). It serves as a guide to the expected standards of behavior for everyone participating in our community spaces, both online and offline.
 
-**Role/Context:** All
+**Why is a Code of Conduct Important?**
+A clear CoC is essential for fostering a positive, safe, and productive environment where everyone feels welcome and respected. It ensures that:
+*   Expectations for behavior are clear and transparent.
+*   Participants understand their rights and responsibilities.
+*   A framework exists for addressing unacceptable behavior constructively.
+*   Our community remains a place where diverse individuals can collaborate and thrive.
 
-**Resource Constraints:** All
+By participating in this community, you agree to abide by this Code of Conduct.
 
+## 2. Main Content: Understanding Our Code of Conduct
 
-**Introduction:**
+### Key Concepts
 
-A Community Code of Conduct (COC) is a set of guidelines that outlines acceptable behavior within a community.  It's crucial for fostering a positive, inclusive, and productive environment for everyone involved.  Without a COC, negative behaviors can easily proliferate, driving away valuable members and harming the overall health of the community. This document explains our community's COC, its importance, and how it relates to our mission pillars.
+*   **Community:** Refers to all participants, including members, contributors, maintainers, event attendees, speakers, sponsors, volunteers, and staff, interacting in any community-managed space (e.g., forums, chat channels, repositories, mailing lists, events).
+*   **Expected Behavior:** Actions and attitudes that contribute positively to the community environment.
+*   **Unacceptable Behavior:** Actions and attitudes that detract from a positive community environment, including harassment, discrimination, and disrespectful conduct.
+*   **Enforcement:** The process by which CoC violations are addressed.
 
+### How It Works: Our Shared Expectations (The Rules)
 
-**1. The Rules: Our Community Code of Conduct**
+We are dedicated to providing a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
-Our community thrives on mutual respect and collaboration.  To ensure this, we adhere to the following rules:
+**Expected Behaviors:**
 
-* **Be Respectful:** Treat all members with courtesy and consideration, regardless of their background, experience, or opinions.  Avoid personal attacks, insults, or harassment.
-* **Be Inclusive:**  Welcome and embrace diversity.  Actively work to create a space where everyone feels safe and included.  Challenge discriminatory or exclusionary behavior.
-* **Be Constructive:** Focus on contributing positively to discussions and projects.  Offer helpful feedback and suggestions, rather than criticism for the sake of it.
-* **Be Responsible:** Take ownership of your actions and their consequences.  Be accountable for your contributions and behavior.
-* **Follow the Law:**  All activity within the community must comply with all applicable laws and regulations.
-* **No Harassment:**  This includes, but is not limited to, bullying, intimidation, sexual harassment, hate speech, and discriminatory language.
-* **No Spam or Unsolicited Advertising:**  Do not post irrelevant or unsolicited promotional content.
-* **Respect Intellectual Property:**  Do not share or use copyrighted material without permission.
-* **Use Appropriate Language:**  Avoid profanity, offensive language, and overly aggressive communication.
+*   **Be Respectful:** Treat everyone with courtesy and consideration. Value diverse viewpoints and experiences. Disagree respectfully and constructively.
+*   **Be Welcoming and Inclusive:** Actively work to create an environment where people of all backgrounds feel safe and included.
+*   **Be Collaborative:** Work together effectively. Offer and accept constructive feedback gracefully. Credit others for their contributions.
+*   **Be Considerate:** Be mindful of how your words and actions affect others. Think before you speak or type.
+*   **Be Professional:** Conduct yourself professionally, even in informal settings. Refrain from inappropriate or disruptive behavior.
+*   **Assume Good Intent (but address impact):** Start by assuming others mean well, but address behavior that has a negative impact, regardless of intent.
 
+**Unacceptable Behaviors:**
 
-**2. How It Works**
+The following behaviors are considered unacceptable within our community:
 
-The COC is not just a list of rules; it's a living document that guides our interactions.  It relies on the active participation of all community members to report violations and uphold the standards of respectful behavior.  We encourage proactive reporting of any behavior that violates this code.  We will investigate reported violations and take appropriate action, which may include warnings, temporary suspensions, or permanent bans.  The specific actions taken will depend on the severity and context of the violation.
+*   **Harassment:** Any behavior that creates a hostile environment, including offensive verbal comments related to protected characteristics (listed above), deliberate intimidation, stalking, following, harassing photography or recording, sustained disruption of talks or other events, inappropriate physical contact, and unwelcome sexual attention.
+*   **Discrimination:** Treating individuals unfairly based on protected characteristics.
+*   **Bullying:** Intimidating, degrading, or humiliating others.
+*   **Trolling:** Deliberately posting inflammatory, extraneous, or off-topic messages with the primary intent of provoking readers into an emotional response or disrupting normal on-topic discussion.
+*   **Doxing:** Publishing private or identifying information about others without their explicit consent.
+*   **Personal Attacks:** Insulting or demeaning other participants.
+*   **Threats or Incitement of Violence:** Making threats against individuals or groups, or encouraging violence.
+*   **Other Conduct:** Any other conduct which could reasonably be considered inappropriate in a professional or community setting.
 
+### Applications
 
-**3. Applications**
+This Code of Conduct applies to:
 
-The COC applies to all aspects of community interaction, including:
+*   **All Community Spaces:** Online forums, chat servers (e.g., Slack, Discord), mailing lists, code repositories (issues, pull requests, comments), wikis, blogs, social media, etc.
+*   **Community Events:** Conferences, meetups, workshops, webinars (both attendees and presenters/organizers).
+*   **Direct Interactions:** Private communications related to community activities.
 
-* **Online Forums:**  Discussions, comments, and posts.
-* **In-Person Events:**  Meetings, workshops, and conferences.
-* **Private Communication:**  Emails, direct messages, and other private channels.
+### Limitations
 
+*   **Not Exhaustive:** This CoC cannot list every possible form of unacceptable behavior. We expect participants to act in the spirit of the CoC.
+*   **Requires Active Participation:** A CoC is only effective if the community actively upholds it through positive behavior and appropriate reporting.
+*   **Context Matters:** Interpretation and enforcement will consider the context of the behavior.
 
-**4. Limitations**
+## 3. Relation to Mission Pillars
 
-While we strive to create a welcoming and inclusive environment, we cannot guarantee the complete absence of negative behavior.  The COC provides a framework for addressing violations, but it cannot prevent every instance of misconduct.  We rely on the active participation of our members to report violations and help maintain a positive community.
+*(Note: Assuming standard community pillars. Replace/adapt these if your organization has specific named pillars.)*
 
+### Pillar: Inclusivity & Diversity
 
-**(The following sections will need to be customized based on your specific mission pillars.  Replace the bracketed information with your actual mission pillars and relevant examples.)**
+This Code of Conduct directly supports our commitment to Inclusivity and Diversity by:
+*   Explicitly prohibiting discrimination and harassment based on a wide range of protected characteristics.
+*   Setting the expectation that all participants actively work to create a welcoming environment for people from all backgrounds.
+*   Ensuring that diverse perspectives can be shared without fear of hostility or marginalization.
 
-**5. [Mission Pillar 1]:  Relationship to the COC**
+### Pillar: Respect & Civility
 
-[Explain how the COC supports the goals of Mission Pillar 1. For example, if Mission Pillar 1 is "Promoting Innovation," you might explain how a respectful and inclusive community fosters creativity and collaboration, leading to innovation.]  Example:  Our commitment to fostering an inclusive environment, as outlined in the COC, directly supports our mission of promoting innovation.  A diverse community brings a wider range of perspectives and ideas, leading to more creative solutions and breakthroughs.
+Respect and Civility are foundational to this CoC. It promotes these values by:
+*   Defining respectful communication and interaction as the standard.
+*   Clearly outlining disrespectful behaviors (like personal attacks and bullying) as unacceptable.
+*   Encouraging participants to value differing viewpoints and engage in constructive disagreement.
 
+### Pillar: Collaboration & Openness
 
-**6. [Mission Pillar 2]: Relationship to the COC**
+A safe and respectful environment, as fostered by the CoC, is essential for effective Collaboration and Openness:
+*   Participants feel safer sharing ideas, asking questions, and contributing when they trust they will be treated respectfully.
+*   The CoC helps prevent disruptive or toxic behavior that can shut down collaboration.
+*   It encourages giving and receiving feedback constructively, a key element of open collaboration.
 
-[Explain how the COC supports the goals of Mission Pillar 2.  For example, if Mission Pillar 2 is "Empowering Users," you might explain how the COC ensures a safe and supportive environment where users feel empowered to contribute.] Example: By ensuring a safe and respectful online space, as stipulated in our COC, we empower users to fully participate and contribute their unique talents and perspectives without fear of harassment or discrimination.
+### Pillar: Safety & Well-being
 
+The CoC prioritizes the Safety and Well-being of all community members by:
+*   Providing clear guidelines against harassment, intimidation, and threats.
+*   Establishing reporting mechanisms for individuals experiencing or witnessing unacceptable behavior.
+*   Creating a predictable environment where participants understand behavioral boundaries, reducing anxiety and promoting psychological safety.
 
-**7. [Mission Pillar 3]: Relationship to the COC**
+### Pillar: Accountability & Enforcement
 
-[Explain how the COC supports the goals of Mission Pillar 3.  For example, if Mission Pillar 3 is "Environmental Sustainability," you might discuss how the COC encourages responsible digital citizenship, reducing the negative environmental impact of online activity.] Example:  Our COC promotes responsible online behavior, which indirectly supports our mission of environmental sustainability by reducing the carbon footprint associated with excessive digital activity and promoting mindful communication.
+This CoC is meaningless without Accountability and Enforcement. It supports this pillar by:
+*   Clearly stating that participation is conditional on adhering to the CoC.
+*   Outlining unacceptable behaviors and the potential consequences.
+*   (Implicitly, though often detailed in a separate enforcement guide) Establishing a process for reporting violations and how they will be investigated and addressed by community leadership or a dedicated committee. This ensures fairness and transparency in upholding community standards.
 
+## 4. Conclusion: Upholding Our Community Standards
 
-**Conclusion:**
+This Code of Conduct outlines our shared commitment to maintaining a respectful, inclusive, and collaborative community. It defines expected behaviors, identifies unacceptable conduct, and underscores our dedication to creating a safe space for everyone.
 
-This Code of Conduct is fundamental to the success and well-being of our community.  By adhering to these guidelines, we can collectively create a positive, inclusive, and productive environment for everyone.  Remember, we all have a responsibility to uphold this code and report any violations we witness.  Your active participation is key to maintaining a vibrant and welcoming community.  If you have any questions or concerns, please contact [Contact Information].
+**Key Takeaways:**
 
+*   Treat everyone with respect and courtesy.
+*   Embrace diversity and strive for inclusivity.
+*   Communicate constructively and professionally.
+*   Harassment and discrimination will not be tolerated.
+*   This CoC applies to all community interactions and spaces.
+
+**Next Steps:**
+
+*   **Familiarize Yourself:** Please read this Code of Conduct thoroughly.
+*   **Practice It:** Actively embody these principles in all your community interactions.
+*   **Speak Up:** If you witness or experience behavior that violates this CoC, please report it through the designated channels (these should be clearly communicated elsewhere, e.g., a community website or event information page). Reporting procedures typically involve contacting specific community moderators, organizers, or a dedicated CoC committee.
+*   **Ask Questions:** If anything in this CoC is unclear, please seek clarification from community leaders or organizers.
+
+Thank you for helping make our community a welcoming and productive place for all!
 
 ## Sources
 
-[weschler2023building] Weschler, E., & Smith, J. (2023). Building Inclusive Online Communities: A Guide for Moderators and Community Managers. *Online Journal of Community Management*.
+[aurora2021codes] Aurora, A., & Sood, G. (2021). Codes of Conduct in Open Source Communities: A Preliminary Analysis of Their Content and Diffusion. In *Proceedings of the 15th ACM/IEEE International Symposium on Empirical Software Engineering and Measurement (ESEM '21)* (pp. 15). Association for Computing Machinery. https://doi.org/10.1145/3475716.3475798
 
-[jones2022community] Jones, S., & Brown, D. (2022). Community Guidelines and the Promotion of Positive Online Interactions. *Journal of Social Media Studies*, *7*(2), 123-145.
+[wohn2020role] Wohn, D. Y., & Sarkar, C. (2020). The Role of Codes of Conduct and Moderation Transparency in Coping With Online Harassment. *Policy & Internet*, *12*(3), 359377. https://doi.org/10.1002/poi3.227
 
-[lee2021impact] Lee, M. (2021). The Impact of Community Codes of Conduct on Online Harassment. In *Proceedings of the International Conference on Online Safety*.
+[robles2020code] Robles, G., Reina, Q., Gonzlez-Barahona, J. M., & Dueas, S. L. (2020). Code of conduct in libre software projects: a quantitative study. *Empirical Software Engineering*, *25*(6), 50005034. https://doi.org/10.1007/s10664-020-09869-y
 
-[davis2020designing] Davis, A., & Green, R. (2020). Designing Effective Community Codes of Conduct: A Case Study Approach. *Journal of Community Informatics*, *16*(2), 1-20.
+[starke2021codes] Starke, A. D., & Gerhard, C. (2021). Codes of Conduct: A Snapshot of the State of the Practice in Research Software Projects. *Journal of Open Research Software*, *9*(1), 23. http://doi.org/10.5334/jors.365
 
-[wilson2019creating] Wilson, T. (2019). Creating a Culture of Respect: Strategies for Implementing and Enforcing Community Codes of Conduct. In *Handbook of Online Community Management*.
+[matias2019civic] Matias, J. N. (2019). The Civic Labor of Volunteer Moderators Online. *Social Media + Society*, *5*(2), 2056305119836778. https://doi.org/10.1177/2056305119836778
 
 
 ## Source Collection Metadata
 
 This content includes sources collected through the Source Collection and Documentation Module of the Agentic AI Content Creation System.
 
-**Collection Date**: 2025-04-22
+**Collection Date**: 2025-04-24
 
 **Source Types**:
 - Academic papers
